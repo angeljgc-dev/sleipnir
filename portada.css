@@ -780,14 +780,20 @@ html[data-js] .pildora__estados li.sale{ transform:translateY(-7px); }
 /* ---------- 08 · cierre ---------- */
 
 .cierre{ position:relative; background:transparent; margin-top:-28px; }
-/* El carril extra solo existe si el motor de scroll llego de verdad: si no,
-   la seccion mide una pantalla y no deja un hueco negro debajo. */
-html[data-coreo] .cierre{ height:180svh; }
+/* El carril largo se gana dos veces: hace falta que el motor de scroll llegara
+   y que la red del mapa arrancara de verdad. Si falta cualquiera de las dos, la
+   seccion mide una pantalla y no deja un carril vacio por el que no pasa nada.
+   Y cuando si pasa, son tres actos (disperso, agrupandose, formado y hablando)
+   y necesitan recorrido: con menos, el pais se arma de golpe y nadie lo ve
+   agruparse, que es lo unico que habia que ver. */
+html[data-coreo] .cierre{ height:100svh; }
+html[data-coreo] .cierre.cierre--vivo{ height:260svh; }
 .cierre__fijo{
   position:relative;
   min-height:100svh;
   display:grid; grid-template-columns:minmax(0,1fr); align-content:center;
-  padding:calc(var(--barra) + 44px) var(--g) 60px;
+  justify-items:center; gap:26px;
+  padding:calc(var(--barra) + 36px) var(--g) 56px;
   background:var(--tinta);
   border-radius:var(--pliego-r, 22px) var(--pliego-r, 22px) 0 0;
   overflow:hidden;
@@ -800,6 +806,20 @@ html[data-coreo] .cierre__fijo{ position:sticky; top:0; height:100svh; min-heigh
 }
 html[data-js] .cierre__red.viva{ opacity:1; }
 html:not([data-js]) .cierre__red{ display:none; }
+
+/* El mapa quieto. Existe siempre y es quien reserva el sitio: el canvas pinta
+   justo encima de esta caja, asi que la posicion del pais la decide el CSS y no
+   el JavaScript. Cuando la red arranca de verdad, este se vuelve invisible pero
+   sigue ocupando su hueco, para que el pais caiga donde ya estaba. */
+.cierre__mapa{
+  width:100%; max-width:560px;
+  /* El alto va dicho y no deducido del viewBox: una figura con proporcion
+     intrinseca dentro de una rejilla sale mal medida y acaba encimada con el
+     panel. Con el alto puesto, el pais se ajusta solo dentro de la caja. */
+  height:clamp(160px, 29svh, 300px);
+  display:block; align-self:center;
+}
+.cierre--vivo .cierre__mapa{ visibility:hidden; }
 /* El texto del cierre no se apoya en el canvas: va sobre chapa solida. */
 .cierre__panel{
   position:relative; z-index:2;
@@ -809,6 +829,12 @@ html:not([data-js]) .cierre__red{ display:none; }
   border:1px solid var(--tinta-3);
   box-shadow:0 44px 100px -34px #000;
   display:grid; grid-template-columns:minmax(0,1fr); justify-items:start; gap:16px;
+  justify-self:start;
+}
+/* Lo que dice la figura, para quien no la ve. */
+.cierre__lectura{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip-path:inset(50%); white-space:nowrap;
 }
 .cierre__titulo{
   margin:0;
@@ -918,8 +944,16 @@ html:not([data-js]) .cierre__red{ display:none; }
   .dato{ padding:20px 22px; }
 
   .cierre{ margin-top:-34px; }
-  .cierre__fijo{ border-radius:var(--pliego-r, 30px) var(--pliego-r, 30px) 0 0; }
-  .cierre__panel{ padding:34px 34px 36px; }
+  /* De 900 para arriba el pais se va a la derecha y el texto se queda a la
+     izquierda: asi ninguno le quita sitio al otro y el panel no tapa el mapa. */
+  .cierre__fijo{
+    border-radius:var(--pliego-r, 30px) var(--pliego-r, 30px) 0 0;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);
+    align-content:center; align-items:center; gap:0 48px;
+    padding:calc(var(--barra) + 40px) var(--g) 64px;
+  }
+  .cierre__panel{ padding:34px 34px 36px; grid-column:1; grid-row:1; }
+  .cierre__mapa{ grid-column:2; grid-row:1; max-width:none; height:min(58svh, 470px); }
 
   .legal{ padding:16px var(--g) 22px; }
   .hoja{ padding:calc(var(--barra) + 72px) var(--g) 110px; }
@@ -927,6 +961,9 @@ html:not([data-js]) .cierre__red{ display:none; }
 
 @media (min-width:1500px){
   .producto__dentro{ gap:0 90px; }
+  /* En pantallas muy anchas el pais deja de crecer: a partir de cierto tamano
+     ya no se lee mejor, solo se separa del texto. */
+  .cierre__mapa{ max-width:820px; justify-self:center; }
 }
 
 /* ---------- refraccion de verdad, solo donde existe ----------

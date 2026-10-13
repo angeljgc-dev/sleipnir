@@ -19,9 +19,7 @@
     var vel = quieto ? 0 : (o.velocidad == null ? 0.2 : o.velocidad);
 
     var dpr = 1, an = 0, al = 0, nodos = [], anclas = [];
-    var px = -9999, py = -9999, rafId = 0, t = 0, dentro = true, conv = 0;
-    // hacia donde se cierra el nudo, en fracciones del lienzo
-    var fx = o.foco ? o.foco[0] : 0.5, fy = o.foco ? o.foco[1] : 0.5;
+    var px = -9999, py = -9999, rafId = 0, t = 0, dentro = true;
 
     function medir() {
       dpr = Math.min(devicePixelRatio || 1, 2);
@@ -88,22 +86,10 @@
       return k;
     }
 
-    // Los nodos se juntan hacia el centro. De 0 a 1. Sirve para el cierre: la
-    // red que estuvo dispersa toda la pagina acaba cerrandose en un nudo.
-    //
-    // No se mueve el nodo: se pinta en otro sitio. Si se le empujara la
-    // posicion, la atraccion se iria acumulando cuadro a cuadro y la red
-    // acabaria colapsada en un punto del que ya no se puede volver. Asi el
-    // apreton es exactamente el que dice el scroll, y se deshace al subir.
-    function converger(v) { conv = v < 0 ? 0 : (v > 1 ? 1 : v); }
-    function setFoco(a, b) { fx = a; fy = b; }
-
     function cuadro() {
       t++;
       ctx.clearRect(0, 0, an, al);
 
-      var cx = an * fx, cy = al * fy;
-      var k = conv * 0.66;
       for (var i = 0; i < nodos.length; i++) {
         var n = nodos[i];
         if (!n.fijo) {
@@ -111,15 +97,12 @@
           if (n.x < 0) { n.x = 0; n.vx = -n.vx; } else if (n.x > an) { n.x = an; n.vx = -n.vx; }
           if (n.y < 0) { n.y = 0; n.vy = -n.vy; } else if (n.y > al) { n.y = al; n.vy = -n.vy; }
         }
-        n.ax = k ? n.x + (cx - n.x) * k : n.x;
-        n.ay = k ? n.y + (cy - n.y) * k : n.y;
+        n.ax = n.x; n.ay = n.y;
         if (n.pulso > 0) n.pulso -= 0.013;
       }
 
-      // enlaces entre nodos. El radio encoge con el apreton, porque si no, al
-      // juntarse todos con todos se dibujarian miles de lineas por cuadro.
-      var re = radioEnlace * (1 - k * 0.78);
-      var r2 = re * re;
+      // enlaces entre nodos
+      var r2 = radioEnlace * radioEnlace;
       ctx.lineWidth = 1;
       for (var a = 0; a < nodos.length; a++) {
         var na = nodos[a];
@@ -129,10 +112,8 @@
           if (d2 > r2) continue;
           var f = 1 - d2 / r2;
           var vivo = Math.max(na.pulso, nb.pulso);
-          // al cerrarse el nudo las lineas se van poniendo calidas: lo que
-          // antes eran conversaciones sueltas acaba siendo una sola cosa
-          ctx.strokeStyle = 'rgba(' + (vivo > 0 || conv > 0.55 ? acento : tinta) + ',' +
-            (f * (vivo > 0 ? 0.5 + vivo * 0.3 : 0.2 + conv * 0.22)).toFixed(3) + ')';
+          ctx.strokeStyle = 'rgba(' + (vivo > 0 ? acento : tinta) + ',' +
+            (f * (vivo > 0 ? 0.5 + vivo * 0.3 : 0.2)).toFixed(3) + ')';
           ctx.beginPath();
           ctx.moveTo(na.ax, na.ay);
           ctx.lineTo(nb.ax, nb.ay);
@@ -208,7 +189,6 @@
 
     return {
       pulse: pulse, mensaje: mensaje, setAnclas: setAnclas,
-      converger: converger, setFoco: setFoco,
       para: para, arranca: arranca, medir: medir,
       nodos: nodos, cuadros: function () { return t; }
     };

@@ -31,8 +31,13 @@ que leer.
 
 Al bajar, cada sección es un **pliego que sube sobre el anterior** y aplana sus esquinas al topar
 con la barra, alternando tinta y papel. Dos piezas ocupan la pantalla completa: el producto, donde
-los cuatro verbos se recorren uno a uno con su conversación al lado, y el cierre, donde la red
-vuelve a pantalla completa y converge en un nudo.
+los cuatro verbos se recorren uno a uno con su conversación al lado, y el cierre.
+
+**El cierre es el remate.** Los puntos entran grandes y muy dispersos, y al bajar encogen y viajan
+a su sitio hasta **formar el mapa de México**, cosido por zonas en vez de dibujado de golpe. Ya
+formado, los negocios empiezan a conversar: mensajes en ámbar que cruzan de un punto a su vecino y
+se apagan. Es la misma idea del sitio dicha al final y completa: los puntos son negocios, las
+líneas conversaciones, y juntos son el mercado.
 
 El nombre se arma a partir de caracteres revueltos y **suelta la página a los 652 ms**. En ese
 mismo instante aparece el primer estado del producto y late su nodo: ruido que se vuelve dato, que
@@ -77,9 +82,9 @@ Chrome con la CPU frenada cuatro veces, recorriendo la página completa con la c
 | Salto de contenido al cargar | 0.0000 | 0.1 |
 | Salto tras el recorrido completo | 0.0354 a 390 | 0.1 |
 | Peso antes del primer pintado | 46.2 KB | 150 KB |
-| Peso total | 103.7 KB | 600 KB |
+| Peso total | 109.4 KB | 600 KB |
 | Coste del cuadro, recorrido completo | 4.30 ms a 390, 4.51 ms a 1280 | 20 ms |
-| Peor cuadro | 12.1 ms | 16.7 ms |
+| Peor cuadro | 16.9 ms al entrar al mapa, 12.1 en el resto | 16.7 ms |
 | Contraste, 240 textos sobre fondo real | ninguno bajo 7.99:1 | 7:1 |
 | Con "reducir movimiento" | 0 animaciones, 0 descargas | 0 |
 | Sin JavaScript | todo legible | |
@@ -100,5 +105,8 @@ python -m http.server 8000
 
 ## Licencias
 
-Instrument Sans y Martian Mono, SIL Open Font License 1.1. El texto completo de cada licencia, con
-su aviso de copyright, está en `fuentes/`.
+- Instrument Sans y Martian Mono, SIL Open Font License 1.1. El texto completo de cada licencia,
+  con su aviso de copyright, está en `fuentes/`.
+- El contorno de México del cierre viene de **Natural Earth** (escala 1:50 m), que es de **dominio
+  público** y no exige atribución; se anota de todas formas. Está simplificado a 140 vértices y
+  escrito dentro del HTML, así que la página no le pide nada a nadie para dibujarlo.

@@ -91,27 +91,36 @@
     }, { passive: true });
   }
 
-  // La red del cierre. Es la misma de la portada, sin anclas y a pantalla
-  // completa, y se enciende junto con el motor de scroll: antes no, porque la
-  // portada todavia esta entregandose.
+  // La red del cierre no es la de la portada: aqui los nodos se juntan hasta
+  // formar Mexico. Se enciende junto con el motor de scroll, no antes, porque
+  // la portada todavia se esta entregando.
+  //
+  // El contorno se lo pide a la figura que ya esta en el HTML, y el sitio donde
+  // va el pais tambien: asi el dato existe una sola vez y la posicion la sigue
+  // mandando el CSS.
   function arrancaCierre() {
     var c = document.getElementById('red2');
-    if (!c || !window.redDeNodos) return;
+    var figura = document.getElementById('mapa-mx');
+    var trazo = document.getElementById('mx-contorno');
+    var sec = document.querySelector('.cierre');
+    if (!c || !figura || !trazo || !sec || !window.mapaDeMexico) return;
     var con = navigator.connection;
     if ((con && con.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)) return;
 
-    // El nudo no se cierra en el centro de la pantalla, sino al lado del
-    // panel: si se cerrara detras, el unico sitio donde la red se ve hacer
-    // algo quedaria tapado justo cuando lo hace.
-    function foco() { return innerWidth >= 900 ? [0.74, 0.46] : [0.5, 0.19]; }
-    var f = foco();
-    red2 = window.redDeNodos(c, { maxNodos: 110, radioEnlace: 160, densidad: 7600, foco: f });
+    red2 = window.__mapa = window.mapaDeMexico(c, {
+      contorno: trazo.getAttribute('d'),
+      region: function () {
+        var a = c.getBoundingClientRect(), b = figura.getBoundingClientRect();
+        if (!b.width || !b.height) return null;
+        return { x: b.left - a.left, y: b.top - a.top, w: b.width, h: b.height };
+      }
+    });
+    if (!red2) return;
+    // El mapa quieto se vuelve invisible pero no desaparece: sigue guardando su
+    // hueco, que es el que acaba de leer el canvas.
+    sec.classList.add('cierre--vivo');
     c.classList.add('viva');
-    addEventListener('resize', function () {
-      var g = foco();
-      red2.setFoco(g[0], g[1]);
-      red2.medir();
-    }, { passive: true });
+    addEventListener('resize', function () { red2.medir(); }, { passive: true });
   }
 
   /* ---------------- la pildora viva ---------------- */
@@ -163,7 +172,11 @@
   var CDN = 'https://cdn.jsdelivr.net/npm/';
 
   function cargaMotor() {
-    arrancaCierre();
+    // El mapa del cierre sale en paralelo con el motor y es local, asi que
+    // siempre llega antes; aun asi se espera por el antes de montar, para que
+    // la coreografia no se encuentre con media pieza. Si no llegara, el cierre
+    // se queda con su mapa quieto, que es entero.
+    var mapa = trae('mexico.js').then(arrancaCierre, function () { });
     return trae(CDN + 'gsap@3.15.0/dist/gsap.min.js')
       .then(function () {
         return Promise.all([
@@ -172,6 +185,7 @@
           trae(CDN + 'lenis@1.3.26/dist/lenis.min.js')
         ]);
       })
+      .then(function () { return mapa; })
       .then(montaScroll)
       .catch(function () { /* sin motor la pagina sigue entera, solo sin coreografia */ });
   }
@@ -399,9 +413,13 @@
         });
     }
     if (!red2) return;
+    // El recorrido fijado manda los tres actos. Van los cinco avisos y no solo
+    // onUpdate: un salto de ancla se brinca el tramo entero y dejaria el pais a
+    // medio formar.
+    function pon(self) { red2.progreso(self.progress); }
     window.ScrollTrigger.create({
-      trigger: sec, start: 'top bottom', end: 'bottom bottom', scrub: true,
-      onUpdate: function (self) { red2.converger((self.progress - 0.3) / 0.7); }
+      trigger: sec, start: 'top top', end: 'bottom bottom', scrub: true,
+      onUpdate: pon, onLeave: pon, onEnterBack: pon, onLeaveBack: pon, onRefresh: pon
     });
   }
 

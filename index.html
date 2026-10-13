@@ -369,15 +369,41 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
 </section>
 
 <!-- =====================================================================
-     08 · Cierre. La red vuelve a pantalla completa por única vez y los
-     nodos se juntan. El texto va sobre chapa sólida, no sobre el canvas.
+     08 · Cierre. La red vuelve a pantalla completa por única vez: los nodos
+     entran dispersos, se agrupan hasta formar México y ahí empiezan a
+     mandarse mensajes. El texto va sobre chapa sólida, no sobre el canvas.
+
+     El contorno está escrito una sola vez, aquí abajo, en la "d" de la
+     figura: así se ve el país sin JavaScript y además es de donde el canvas
+     saca sus coordenadas. Viene de Natural Earth (dominio público, escala
+     1:50 m), simplificado a 140 vértices.
      ===================================================================== -->
 <section class="cierre" id="cierre">
   <div class="cierre__fijo">
     <canvas class="cierre__red" id="red2" aria-hidden="true"></canvas>
+
+    <svg class="cierre__mapa" id="mapa-mx" viewBox="0 0 1000 654" aria-hidden="true">
+      <defs>
+        <pattern id="mx-negocios" width="30" height="26" patternUnits="userSpaceOnUse">
+          <circle cx="7" cy="7" r="2" fill="#ECEAE4" fill-opacity=".46"/>
+          <circle cx="22" cy="20" r="2" fill="#ECEAE4" fill-opacity=".46"/>
+        </pattern>
+        <pattern id="mx-activos" width="122" height="108" patternUnits="userSpaceOnUse">
+          <circle cx="34" cy="29" r="2.6" fill="#FFB357"/>
+          <circle cx="95" cy="83" r="2.6" fill="#FFB357"/>
+        </pattern>
+        <path id="mx-contorno" d="M0 7L79 0L76 7L201 50L294 50L294 34L352 34L383 62L401 75L417 109L430 120L458 134L470 126L475 111L490 102L513 105L543 131L555 158L581 186L583 204L595 226L622 238L652 247L659 243L642 300L636 364L643 400L660 436L682 463L688 482L703 503L724 505L745 524L778 515L800 513L830 504L836 513L853 508L848 498L871 481L878 461L884 422L901 412L957 400L1000 407L999 426L979 454L971 471L980 473L966 520L960 500L944 514L935 531L923 537L863 537L862 557L849 557L881 588L880 599L838 600L823 627L827 635L821 654L802 633L766 600L741 595L734 587L715 603L680 615L658 605L639 603L606 583L575 576L537 559L504 533L476 528L452 518L436 500L402 483L384 459L378 444L392 437L384 430L393 404L379 386L374 363L354 343L331 313L303 292L300 277L262 257L254 241L262 231L252 216L243 217L237 203L220 194L218 175L198 171L164 133L145 98L133 69L135 55L116 49L105 39L98 44L72 29L74 56L85 97L109 118L120 137L141 155L145 176L158 187L183 216L193 250L201 259L213 286L213 302L223 310L227 302L254 333L253 342L238 354L223 328L167 284L167 260L157 234L136 221L131 208L117 216L89 198L69 176L84 178L97 169L98 148L70 120L48 107L35 69L15 41Z"/>
+      </defs>
+      <!-- El mismo contorno usado dos veces: el país lleno de puntos, y encima los
+           pocos que en ese momento estarían hablando. El dato no se repite. -->
+      <use href="#mx-contorno" fill="url(#mx-negocios)" stroke="#ECEAE4" stroke-opacity=".17" stroke-width="2.4"/>
+      <use href="#mx-contorno" fill="url(#mx-activos)"/>
+    </svg>
+
     <div class="cierre__panel">
       <p class="indice">08 <span>/</span> cierre</p>
       <p class="cierre__titulo">Que el negocio conteste.<br>De eso vive Sleipnir.</p>
+      <p class="cierre__lectura">La figura es el mapa de México dibujado con puntos: cada punto es un negocio y cada línea encendida, una conversación que acaba de pasar por ahí.</p>
       <p class="chapa"><span class="chapa__punto" aria-hidden="true"></span>Recepción IA &middot; en WhatsApp</p>
       <a class="boton boton--fuerte cierre__accion" href="#planes">Ver los planes</a>
     </div>
@@ -391,6 +417,8 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
   <a href="terminos.html">Términos del servicio</a>
 </p>
 
+<!-- mexico.js no va aquí: solo hace falta al final de la página y se baja con la
+     coreografía, ya entregada la portada. -->
 <script src="red.js" defer></script>
 <script src="portada.js" defer></script>
 </body>
