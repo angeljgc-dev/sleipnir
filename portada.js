@@ -303,6 +303,19 @@
     montaPlanes(gsap);
     montaCierre(gsap);
     window.ScrollTrigger.refresh();
+
+    // En un telefono la barra de direcciones se esconde y reaparece al subir y
+    // bajar, y eso cambia innerHeight sin cambiar nada del reparto: los altos
+    // de la pagina van en svh. Pero los tramos del scroll si se miden contra
+    // innerHeight, y si no se vuelven a medir se quedan torcidos: el cierre se
+    // quedaba a medio formar aunque se llegara hasta abajo del todo. Se espera
+    // a que pare de moverse, porque durante el gesto llegan muchos avisos
+    // seguidos y volver a medir en cada uno no es gratis.
+    var remide;
+    addEventListener('resize', function () {
+      clearTimeout(remide);
+      remide = setTimeout(function () { window.ScrollTrigger.refresh(); }, 260);
+    }, { passive: true });
   }
 
   // El cambio de material es la transicion. Cada pliego llega con las
