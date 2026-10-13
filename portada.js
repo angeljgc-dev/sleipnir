@@ -26,6 +26,7 @@
   var hueco = document.getElementById('hueco');
   var estados = document.getElementById('estados');
   var items = estados ? [].slice.call(estados.children) : [];
+  var listaAnclas = document.querySelector('.anclas');
   var anclas = [].slice.call(document.querySelectorAll('.ancla'));
   var red = null;
   var red2 = null;
@@ -76,16 +77,39 @@
   }
 
   // Lo que el canvas tiene encima y es opaco. La red no lo usa para dibujar:
-  // lo usa para decidir por donde sacar el recorrido, porque una curva que
-  // pasa por detras de una chapa no se ve.
+  // lo usa para decidir por donde sacar el recorrido y donde puede aparecer una
+  // etiqueta, porque lo que pasa por detras de una chapa no se ve.
+  //
+  // Los tres rotulos no entran: el del 01 lo arma la red con el tamano que se
+  // le pasa aparte, y el del 02 y el del 03 cambian de sitio en cada vuelta,
+  // asi que no son obstaculo sino resultado.
   function chapasDeLaLamina() {
     if (!canvas) return [];
     var c = canvas.getBoundingClientRect();
-    var fuera = [].slice.call(document.querySelectorAll('.ancla__texto, .lamina__rotulo, .ficha'));
+    var fuera = [].slice.call(document.querySelectorAll('.lamina__rotulo, .ficha'));
     return fuera.map(function (e) {
       var b = e.getBoundingClientRect();
       return [b.left - c.left, b.top - c.top, b.right - c.left, b.bottom - c.top];
     });
+  }
+
+  // Cuanto mide cada rotulo con su punto. Se mide con offsetWidth y no con la
+  // caja pintada: las dos etiquetas que aparecen entran escaladas, y la caja
+  // pintada de algo a escala .96 mide de menos.
+  function tamanosDeAnclas() {
+    return anclas.map(function (a) { return [a.offsetWidth, a.offsetHeight]; });
+  }
+
+  // Al volver a medir, el 02 y el 03 sueltan el sitio donde los dejo la ultima
+  // vuelta y vuelven al que les reserva el CSS. Estan escondidos, asi que no se
+  // ve nada; lo que se evita es que una caja medida contra la lamina de antes
+  // se quede fuera de una ventana que acaba de encoger.
+  function sueltaRotulos() {
+    for (var i = 1; i < anclas.length; i++) {
+      anclas[i].style.removeProperty('--x');
+      anclas[i].style.removeProperty('--y');
+      anclas[i].classList.remove('ancla--izq');
+    }
   }
 
   function arrancaRed() {
@@ -96,11 +120,17 @@
     if ((con && con.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)) return;
 
     red = window.__red = window.redDeNodos(canvas, { maxNodos: 72, radioEnlace: 128 });
-    red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina());
+    red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina(), tamanosDeAnclas());
     canvas.classList.add('viva');
+    // Desde aqui el 02 y el 03 dejan de estar puestos: aparecen donde el
+    // mensaje los toca. La marca se pone ahora y no en el HTML porque si la red
+    // no arranca (poca memoria, ahorro de datos) los tres rotulos tienen que
+    // quedarse como estan, que es lo que se lee sin movimiento.
+    if (listaAnclas) listaAnclas.classList.add('anclas--vivas');
     addEventListener('resize', function () {
       red.medir();
-      red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina());
+      red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina(), tamanosDeAnclas());
+      sueltaRotulos();
     }, { passive: true });
   }
 
@@ -159,10 +189,35 @@
     setTimeout(function () { a.classList.remove('late'); }, 900);
   }
 
-  // El recorrido no sale cuando le toca a un reloj suyo: sale calculado hacia
-  // atras desde el instante en que la pildora va a decir "cita agendada", para
-  // que el mensaje entre en "03 una cita" cuando esa frase ya se lee. Las dos
-  // ideas del sitio dicen entonces la misma cosa a la vez.
+  // Lo que la red va contando de la vuelta. El 02 y el 03 no estan puestos: se
+  // colocan en el destino que toco esta vuelta, aparecen cuando el mensaje
+  // llega y se van cuando su linea se recoge. El texto no se mueve de sitio
+  // mientras se lee: se coloca antes de existir y se queda quieto hasta que
+  // desaparece.
+  function flujo(ev, dato) {
+    var a;
+    if (ev === 'sitios') {
+      for (var i = 0; i < dato.length; i++) {
+        a = anclas[i + 1];
+        if (!a) continue;
+        a.style.setProperty('--x', Math.round(dato[i].p[0]) + 'px');
+        a.style.setProperty('--y', Math.round(dato[i].p[1]) + 'px');
+        a.classList.toggle('ancla--izq', !!dato[i].izq);
+      }
+      late(0);
+      return;
+    }
+    a = anclas[dato];
+    if (!a) return;
+    if (ev === 'llega') { a.classList.add('puesta'); late(dato); }
+    else a.classList.remove('puesta');
+  }
+
+  // La vuelta no sale cuando le toca a un reloj suyo: se cuelga del de la
+  // pildora, calculada hacia atras desde el estado que esta por entrar, para
+  // que el mensaje llegue al "03 una cita" cuando esa frase ya se lee. De dos
+  // vueltas, una entra con "cita agendada": ahi las dos ideas del sitio dicen
+  // la misma cosa a la vez.
   //
   // El retraso no es cero: el estado nuevo de la pildora entra con su propia
   // espera de 200 ms, asi que la llegada se corre un poco mas alla del cambio
@@ -170,10 +225,10 @@
   // pildora todavia en blanco.
   var LEE_PILDORA = 320;
 
-  function programaViaje() {
+  function programaVuelta() {
     if (!red) return;
     clearTimeout(reloj);
-    reloj = setTimeout(function () { red.recorre(late); }, Math.max(0, PASO + LEE_PILDORA - red.duraViaje));
+    reloj = setTimeout(function () { red.vuelta(flujo); }, Math.max(0, PASO + LEE_PILDORA - red.llega03));
   }
 
   function pintaEstado(n) {
@@ -183,20 +238,26 @@
     });
     estados.style.width = anchoDeEstado(items[n]) + 'px';
     if (!red) return;
-    // Los tres nodos rotulados ya no laten con cada estado: se encienden cuando
-    // pasa el mensaje y nada mas. Lo que sigue el pulso de la pildora es un
-    // negocio cualquiera del resto de la red.
+    // Los nodos rotulados ya no laten con cada estado: se encienden cuando pasa
+    // el mensaje y nada mas. Lo que sigue el pulso de la pildora es un negocio
+    // cualquiera del resto de la red.
     red.pulse();
-    if ((n + 1) % items.length === 0) programaViaje();
+    // Dos vueltas por cada ciclo de la pildora, que son cuatro estados de
+    // 3.2 s: una entra en el 03 justo con "cita agendada" y la otra a la mitad
+    // del ciclo. Atar las dos a esa frase obligaria a dejar la lamina quieta
+    // 5.8 s entre vuelta y vuelta, y eso es lo que el cliente ya vio y no
+    // quiere. Asi la lamina descansa 1.5 s y nada se desacompasa, porque el
+    // reloj es uno: el de la pildora.
+    if (n % 2 === 1) programaVuelta();
   }
 
   function arrancaPildora() {
     if (!estados || !items.length) return;
     // El ancho se fija con la tipografia ya cargada; si no, la pildora mide mal.
     estados.style.width = anchoDeEstados() + 'px';
-    // Se empieza por el ultimo estado a proposito: asi el primer recorrido sale
-    // enseguida y quien acaba de llegar ve el flujo sin esperar una vuelta
-    // entera, pero despues de que el nombre haya soltado la pagina.
+    // Se empieza por el ultimo estado a proposito: asi la primera vuelta sale
+    // enseguida y quien acaba de llegar ve el flujo entero sin esperar, pero
+    // despues de que el nombre haya soltado la pagina.
     cual = items.length - 1;
     pintaEstado(cual);
     setInterval(function () {
@@ -620,7 +681,7 @@
       if (estados && items.length) {
         estados.style.width = anchoDeEstado(items[cual]) + 'px';
       }
-      if (red) red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina());
+      if (red) { red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina(), tamanosDeAnclas()); sueltaRotulos(); }
       if (red2) red2.medir();
       if (window.ScrollTrigger) window.ScrollTrigger.refresh();
     });

@@ -213,10 +213,41 @@ html[data-js] .lamina__red.viva{ opacity:1; }
 }
 /* En telefono las tres anclas se reparten la lamina sin pisar el rotulo de
    arriba ni la ficha de abajo. El ancla 02 es la de etiqueta mas larga, asi
-   que queda a la derecha del titulo de la ficha y por encima de el. */
+   que queda a la derecha del titulo de la ficha y por encima de el.
+
+   Con la red viva estas dos posiciones no son donde se queda el rotulo, sino
+   una de las paradas posibles: las de un telefono, donde el sitio libre da para
+   poco. El guion las vuelve a escribir en cada vuelta. */
 .ancla:nth-child(1){ --x:8%;  --y:50%; }
 .ancla:nth-child(2){ --x:38%; --y:66%; }
 .ancla:nth-child(3){ --x:57%; --y:42%; }
+
+/* Cuando a la derecha del punto no cabe la etiqueta, cuelga del otro lado. En
+   una lamina estrecha eso es la mitad de los sitios posibles. */
+.ancla--izq{ flex-direction:row-reverse; transform:translate(calc(5px - 100%), -50%); }
+
+/* El 02 y el 03 no estan puestos: aparecen donde el mensaje toca y se van con
+   su linea. La marca la pone el guion cuando la red arranca de verdad, asi que
+   sin canvas, sin JavaScript o con movimiento reducido los tres rotulos se
+   quedan donde estan y quietos. Lo que se oculta es solo visual: los tres
+   textos siguen en el HTML, en el mismo orden, y el lector de pantalla los
+   sigue leyendo siempre. */
+html[data-js] .anclas--vivas .ancla:nth-child(n+2){
+  opacity:0; pointer-events:none;
+  transform:translate(-5px,-50%) scale(.96);
+  transition:opacity .3s linear, transform .3s cubic-bezier(.2,.8,.2,1);
+}
+html[data-js] .anclas--vivas .ancla--izq:nth-child(n+2){
+  transform:translate(calc(5px - 100%), -50%) scale(.96);
+}
+html[data-js] .anclas--vivas .ancla:nth-child(n+2).puesta{
+  opacity:1; pointer-events:auto;
+  transform:translate(-5px,-50%) scale(1);
+  transition:opacity .22s linear, transform .3s cubic-bezier(.2,.8,.2,1);
+}
+html[data-js] .anclas--vivas .ancla--izq:nth-child(n+2).puesta{
+  transform:translate(calc(5px - 100%), -50%) scale(1);
+}
 
 .ancla__punto{
   width:10px; height:10px; flex:0 0 auto; border-radius:50%;
