@@ -75,6 +75,19 @@
     });
   }
 
+  // Lo que el canvas tiene encima y es opaco. La red no lo usa para dibujar:
+  // lo usa para decidir por donde sacar el recorrido, porque una curva que
+  // pasa por detras de una chapa no se ve.
+  function chapasDeLaLamina() {
+    if (!canvas) return [];
+    var c = canvas.getBoundingClientRect();
+    var fuera = [].slice.call(document.querySelectorAll('.ancla__texto, .lamina__rotulo, .ficha'));
+    return fuera.map(function (e) {
+      var b = e.getBoundingClientRect();
+      return [b.left - c.left, b.top - c.top, b.right - c.left, b.bottom - c.top];
+    });
+  }
+
   function arrancaRed() {
     if (!canvas || !window.redDeNodos) return;
     // Dos razones para no cargarla: el visitante pidio ahorrar datos, o el
@@ -83,11 +96,11 @@
     if ((con && con.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)) return;
 
     red = window.__red = window.redDeNodos(canvas, { maxNodos: 72, radioEnlace: 128 });
-    red.setAnclas(posicionesDeAnclas());
+    red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina());
     canvas.classList.add('viva');
     addEventListener('resize', function () {
       red.medir();
-      red.setAnclas(posicionesDeAnclas());
+      red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina());
     }, { passive: true });
   }
 
@@ -125,10 +138,42 @@
 
   /* ---------------- la pildora viva ---------------- */
 
+  // offsetWidth viene redondeado, asi que se le suma un pixel: la lista va
+  // recortada a su propio ancho y medio pixel de menos le comeria el filo a la
+  // ultima letra.
+  function anchoDeEstado(li) { return Math.ceil(li.offsetWidth) + 1; }
+
   function anchoDeEstados() {
     var w = 0;
-    items.forEach(function (li) { w = Math.max(w, Math.ceil(li.offsetWidth)); });
+    items.forEach(function (li) { w = Math.max(w, anchoDeEstado(li)); });
     return w;
+  }
+
+  var PASO = 3200;        // lo que dura cada estado de la pildora
+  var reloj = 0;
+
+  function late(i) {
+    var a = anclas[i];
+    if (!a) return;
+    a.classList.add('late');
+    setTimeout(function () { a.classList.remove('late'); }, 900);
+  }
+
+  // El recorrido no sale cuando le toca a un reloj suyo: sale calculado hacia
+  // atras desde el instante en que la pildora va a decir "cita agendada", para
+  // que el mensaje entre en "03 una cita" cuando esa frase ya se lee. Las dos
+  // ideas del sitio dicen entonces la misma cosa a la vez.
+  //
+  // El retraso no es cero: el estado nuevo de la pildora entra con su propia
+  // espera de 200 ms, asi que la llegada se corre un poco mas alla del cambio
+  // de clase. Si se atara al cambio pelado, el mensaje entraria a 03 con la
+  // pildora todavia en blanco.
+  var LEE_PILDORA = 320;
+
+  function programaViaje() {
+    if (!red) return;
+    clearTimeout(reloj);
+    reloj = setTimeout(function () { red.recorre(late); }, Math.max(0, PASO + LEE_PILDORA - red.duraViaje));
   }
 
   function pintaEstado(n) {
@@ -136,26 +181,28 @@
       li.classList.toggle('activo', i === n);
       li.classList.toggle('sale', i !== n);
     });
-    estados.style.width = Math.ceil(items[n].offsetWidth) + 'px';
-    if (red) {
-      var k = red.mensaje(n % anclas.length);
-      var a = anclas[k];
-      if (a) {
-        a.classList.add('late');
-        setTimeout(function () { a.classList.remove('late'); }, 900);
-      }
-    }
+    estados.style.width = anchoDeEstado(items[n]) + 'px';
+    if (!red) return;
+    // Los tres nodos rotulados ya no laten con cada estado: se encienden cuando
+    // pasa el mensaje y nada mas. Lo que sigue el pulso de la pildora es un
+    // negocio cualquiera del resto de la red.
+    red.pulse();
+    if ((n + 1) % items.length === 0) programaViaje();
   }
 
   function arrancaPildora() {
     if (!estados || !items.length) return;
     // El ancho se fija con la tipografia ya cargada; si no, la pildora mide mal.
     estados.style.width = anchoDeEstados() + 'px';
-    pintaEstado(0);
+    // Se empieza por el ultimo estado a proposito: asi el primer recorrido sale
+    // enseguida y quien acaba de llegar ve el flujo sin esperar una vuelta
+    // entera, pero despues de que el nombre haya soltado la pagina.
+    cual = items.length - 1;
+    pintaEstado(cual);
     setInterval(function () {
       cual = (cual + 1) % items.length;
       pintaEstado(cual);
-    }, 3200);
+    }, PASO);
   }
 
   /* ---------------- coreografia de scroll (se baja al final) ---------------- */
@@ -245,6 +292,10 @@
     // antes: cuelgan de ella los estados que esconden contenido, asi que si el
     // motor nunca hubiera llegado no se perderia una linea.
     raiz.dataset.coreo = '1';
+    // La marca acaba de cambiar el alto del cierre y de fijar su caja. El mapa
+    // toma su sitio de esa caja, asi que se lo vuelve a preguntar ahora que es
+    // el definitivo; medido antes, el pais caeria donde estaba la caja vieja.
+    if (red2) red2.medir();
     montaPliegos(gsap);
     montaFlujo(gsap);
     montaProducto(gsap);
@@ -492,6 +543,10 @@
       fijo = true;
       ficha.style.zIndex = '60';
       pildora.style.position = 'fixed';
+      // Ya suelta de la lamina, los estados se cuelgan de la derecha: desde
+      // aqui hasta la barra el borde derecho de la pildora es el que esta cerca
+      // del filo de la ventana.
+      pildora.classList.add('fija');
       // el muelle le reserva sitio dentro de la barra, para que el giro se
       // recorte solo y nunca quede por debajo de la pildora
       muelle.style.width = Math.ceil(acoplado + 12) + 'px';
@@ -500,6 +555,7 @@
     function suelta() {
       fijo = false;
       pildora.classList.remove('acoplada');
+      pildora.classList.remove('fija');
       pildora.style.position = '';
       pildora.style.left = pildora.style.right = pildora.style.top = '';
       pildora.style.transform = '';
@@ -549,9 +605,10 @@
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(function () {
       if (estados && items.length) {
-        estados.style.width = Math.ceil(items[cual].offsetWidth) + 'px';
+        estados.style.width = anchoDeEstado(items[cual]) + 'px';
       }
-      if (red) red.setAnclas(posicionesDeAnclas());
+      if (red) red.setAnclas(posicionesDeAnclas(), chapasDeLaLamina());
+      if (red2) red2.medir();
       if (window.ScrollTrigger) window.ScrollTrigger.refresh();
     });
   }

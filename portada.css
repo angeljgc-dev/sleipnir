@@ -352,18 +352,36 @@ html:not([data-js]) .pildora__estados li{
 html:not([data-js]) .bloque__pie{ margin-top:14px; padding-top:12px; gap:16px; }
 html[data-js] .pildora__estados{
   position:relative; display:block; height:1.35em; min-width:1px;
-  transition:width .44s cubic-bezier(.2,.8,.2,1);
+  transition:width .26s cubic-bezier(.2,.8,.2,1);
+  /* Los cuatro estados estan uno encima de otro y el mas largo mide 107 px mas
+     que el mas corto: con la pildora acoplada al borde derecho de la barra, ese
+     estado escondido asomaba 33 px fuera de la ventana a 1920 y 55 a 390. Se
+     recorta a lo ancho de la pildora. No se usa overflow porque el estado que
+     entra y el que sale se mueven siete pixeles en vertical y hay que dejarlos
+     pasar. */
+  clip-path:inset(-14px 0);
 }
+/* Los cuatro estados van uno encima de otro, asi que el que sale tiene que
+   haberse ido antes de que entre el siguiente: dos renglones distintos a media
+   opacidad y corridos siete pixeles no se leen, se emborronan. Por eso el que
+   entra espera, y no es un cruce. */
 html[data-js] .pildora__estados li{
   position:absolute; left:0; top:0;
   opacity:0; transform:translateY(7px);
   pointer-events:none;
-  transition:opacity .26s linear, transform .3s cubic-bezier(.2,.8,.2,1);
+  transition:opacity .15s linear, transform .22s cubic-bezier(.2,.8,.2,1);
 }
 html[data-js] .pildora__estados li.activo{
   opacity:1; transform:none; pointer-events:auto;
+  transition:opacity .2s linear .2s, transform .28s cubic-bezier(.2,.8,.2,1) .2s;
 }
 html[data-js] .pildora__estados li.sale{ transform:translateY(-7px); }
+/* Desde que la pildora se suelta de la lamina y hasta que se acopla, lo que
+   anda cerca del filo de la ventana es su borde derecho. Asi que los estados se
+   cuelgan de la derecha: uno mas largo que el puesto crece hacia dentro de la
+   barra y no hacia fuera. En reposo se cuelgan de la izquierda, que dentro de
+   la lamina es donde hay sitio. */
+html[data-js] .pildora.fija .pildora__estados li{ left:auto; right:0; }
 
 /* ---------- bloque de titulo ---------- */
 
