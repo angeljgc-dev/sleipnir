@@ -28,6 +28,7 @@
   var items = estados ? [].slice.call(estados.children) : [];
   var anclas = [].slice.call(document.querySelectorAll('.ancla'));
   var red = null;
+  var red2 = null;
   var cual = 0;
 
   /* ---------------- el nombre se descifra ---------------- */
@@ -90,6 +91,29 @@
     }, { passive: true });
   }
 
+  // La red del cierre. Es la misma de la portada, sin anclas y a pantalla
+  // completa, y se enciende junto con el motor de scroll: antes no, porque la
+  // portada todavia esta entregandose.
+  function arrancaCierre() {
+    var c = document.getElementById('red2');
+    if (!c || !window.redDeNodos) return;
+    var con = navigator.connection;
+    if ((con && con.saveData) || (navigator.deviceMemory && navigator.deviceMemory <= 2)) return;
+
+    // El nudo no se cierra en el centro de la pantalla, sino al lado del
+    // panel: si se cerrara detras, el unico sitio donde la red se ve hacer
+    // algo quedaria tapado justo cuando lo hace.
+    function foco() { return innerWidth >= 900 ? [0.74, 0.46] : [0.5, 0.19]; }
+    var f = foco();
+    red2 = window.redDeNodos(c, { maxNodos: 110, radioEnlace: 160, densidad: 7600, foco: f });
+    c.classList.add('viva');
+    addEventListener('resize', function () {
+      var g = foco();
+      red2.setFoco(g[0], g[1]);
+      red2.medir();
+    }, { passive: true });
+  }
+
   /* ---------------- la pildora viva ---------------- */
 
   function anchoDeEstados() {
@@ -139,6 +163,7 @@
   var CDN = 'https://cdn.jsdelivr.net/npm/';
 
   function cargaMotor() {
+    arrancaCierre();
     return trae(CDN + 'gsap@3.15.0/dist/gsap.min.js')
       .then(function () {
         return Promise.all([
@@ -201,6 +226,183 @@
     });
 
     acopla(losa);
+
+    // De aqui para abajo, el resto de la pagina. La marca se pone ahora y no
+    // antes: cuelgan de ella los estados que esconden contenido, asi que si el
+    // motor nunca hubiera llegado no se perderia una linea.
+    raiz.dataset.coreo = '1';
+    montaPliegos(gsap);
+    montaFlujo(gsap);
+    montaProducto(gsap);
+    montaRazon(gsap);
+    montaPlanes(gsap);
+    montaCierre(gsap);
+    window.ScrollTrigger.refresh();
+  }
+
+  // El cambio de material es la transicion. Cada pliego llega con las
+  // esquinas de arriba redondeadas y las aplana al topar con la barra, igual
+  // que ya hace la losa de papel con la portada. No hay un efecto nuevo por
+  // seccion: hay un gesto, repetido.
+  function montaPliegos(gsap) {
+    [].forEach.call(document.querySelectorAll('.pliego:not(.losa)'), function (p) {
+      var r = parseFloat(getComputedStyle(p).borderTopLeftRadius) || 0;
+      if (!r) return;
+      gsap.fromTo(p,
+        { borderTopLeftRadius: r, borderTopRightRadius: r },
+        {
+          borderTopLeftRadius: 0, borderTopRightRadius: 0, ease: 'none',
+          scrollTrigger: { trigger: p, start: 'top bottom', end: 'top top', scrub: 0.4 }
+        });
+    });
+  }
+
+  // El mapa de la portada, aqui quieto: lo unico que se mueve es el punto
+  // ambar bajando el riel, que es el mensaje recorriendo los tres pasos.
+  function montaFlujo(gsap) {
+    var f = document.querySelector('.flujo');
+    if (!f) return;
+    gsap.from(f.querySelectorAll('.flujo__paso'), {
+      opacity: 0, y: 18, duration: 0.6, stagger: 0.12, ease: 'power2.out',
+      scrollTrigger: { trigger: f, start: 'top 84%' }
+    });
+    gsap.fromTo(f.querySelector('.flujo__riel'), { scaleY: 0 }, {
+      scaleY: 1, ease: 'none',
+      scrollTrigger: { trigger: f, start: 'top 76%', end: 'bottom 74%', scrub: 0.5 }
+    });
+    // El punto baja con transform y no con top: mover top lo haria pasar por
+    // el reparto de la pagina en cada cuadro, y eso cuenta como salto.
+    var via = f.querySelector('.flujo__via');
+    gsap.fromTo(f.querySelector('.flujo__movil'), { y: 0 }, {
+      y: function () { return via.offsetHeight; }, ease: 'none',
+      scrollTrigger: { trigger: f, start: 'top 76%', end: 'bottom 74%', scrub: 0.5 }
+    });
+  }
+
+  // El producto no se describe: se queda fijado mientras se recorren los
+  // cuatro verbos, uno por uno, con su conversacion.
+  function montaProducto(gsap) {
+    var sec = document.getElementById('producto');
+    if (!sec) return;
+    var lista = [].slice.call(sec.querySelectorAll('.charla'));
+    var fijo = sec.querySelector('.producto__fijo');
+    var cabeza = sec.querySelector('.producto__cabeza');
+    if (lista.length < 2 || !fijo || !cabeza) return;
+
+    var marcas = document.createElement('div');
+    marcas.className = 'avance';
+    marcas.setAttribute('aria-hidden', 'true');
+    lista.forEach(function () { marcas.appendChild(document.createElement('span')); });
+    cabeza.appendChild(marcas);
+
+    var dentro = sec.querySelector('.producto__dentro');
+
+    // Cuanto necesita un estado solo contra cuanto hay. Se mide el alto real
+    // del contenido, no el desbordamiento del contenedor: con el contenido
+    // centrado, lo que se sale por abajo es la mitad y el otro tanto se sale
+    // por arriba, asi que preguntarle al contenedor da la mitad del problema.
+    function cabe() {
+      var cs = getComputedStyle(fijo);
+      var hueco = fijo.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      return dentro.getBoundingClientRect().height <= hueco - 2;
+    }
+
+    sec.classList.add('fijada');
+    // Si un estado solo no cabe entero en la pantalla, no se fija nada: la
+    // seccion se queda como lista de cuatro conversaciones, que es lo que ya
+    // habia y es mas informacion, no menos. Recortar texto seria peor.
+    if (!cabe()) {
+      sec.classList.remove('fijada');
+      marcas.parentNode.removeChild(marcas);
+      return;
+    }
+
+    var puesto = -1;
+    function pinta(n) {
+      lista.forEach(function (c, i) { c.classList.toggle('activa', i === n); });
+      [].forEach.call(marcas.children, function (s, i) { s.classList.toggle('viva', i === n); });
+    }
+    pinta(0);
+    puesto = 0;
+
+    window.ScrollTrigger.create({
+      trigger: sec, start: 'top top', end: 'bottom bottom',
+      onUpdate: function (self) {
+        var n = Math.floor(self.progress * lista.length);
+        if (n > lista.length - 1) n = lista.length - 1;
+        if (n < 0) n = 0;
+        if (n !== puesto) { puesto = n; pinta(n); }
+      }
+    });
+
+    // Si cambia el alto de la ventana y deja de caber, se desfija.
+    addEventListener('resize', function () {
+      if (!sec.classList.contains('fijada')) return;
+      if (!cabe()) {
+        sec.classList.remove('fijada');
+        lista.forEach(function (c) { c.classList.remove('activa'); });
+        window.ScrollTrigger.refresh();
+      }
+    }, { passive: true });
+  }
+
+  function montaRazon(gsap) {
+    var t = document.querySelector('.titular--roto');
+    if (t) {
+      try {
+        var partido = new window.SplitText(t, { type: 'lines', linesClass: 'linea' });
+        gsap.from(partido.lines, {
+          yPercent: 112, opacity: 0, duration: 0.85, stagger: 0.08, ease: 'power3.out',
+          scrollTrigger: { trigger: t, start: 'top 88%' }
+        });
+        [].forEach.call(t.querySelectorAll('.linea'), function (l) {
+          l.style.display = 'block';
+          l.style.overflow = 'visible';
+        });
+      } catch (e) { /* si SplitText no llega, el titular ya esta escrito */ }
+    }
+    gsap.from('.razon__puntos li', {
+      opacity: 0, y: 16, duration: 0.6, stagger: 0.08, ease: 'power2.out',
+      scrollTrigger: { trigger: '.razon__puntos', start: 'top 90%' }
+    });
+  }
+
+  // Lo unico que se mueve en los planes es el filete que corona cada columna.
+  // Los precios no: estan quietos y legibles desde el primer cuadro.
+  function montaPlanes(gsap) {
+    var planes = [].slice.call(document.querySelectorAll('.plan'));
+    if (!planes.length) return;
+    var filetes = planes.map(function (p) {
+      var f = document.createElement('span');
+      f.className = 'plan__filete';
+      f.setAttribute('aria-hidden', 'true');
+      p.appendChild(f);
+      return f;
+    });
+    gsap.fromTo(filetes, { scaleX: 0 }, {
+      scaleX: 1, duration: 0.9, stagger: 0.12, ease: 'power2.out',
+      scrollTrigger: { trigger: '.planes__rejilla', start: 'top 86%' }
+    });
+  }
+
+  function montaCierre(gsap) {
+    var sec = document.querySelector('.cierre');
+    if (!sec) return;
+    var caja = sec.querySelector('.cierre__fijo');
+    var r = parseFloat(getComputedStyle(caja).borderTopLeftRadius) || 0;
+    if (r) {
+      gsap.fromTo(caja,
+        { borderTopLeftRadius: r, borderTopRightRadius: r },
+        {
+          borderTopLeftRadius: 0, borderTopRightRadius: 0, ease: 'none',
+          scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top top', scrub: 0.4 }
+        });
+    }
+    if (!red2) return;
+    window.ScrollTrigger.create({
+      trigger: sec, start: 'top bottom', end: 'bottom bottom', scrub: true,
+      onUpdate: function (self) { red2.converger((self.progress - 0.3) / 0.7); }
+    });
   }
 
   // La pildora sube con la pagina hasta que topa con la barra, y ahi se queda
@@ -250,6 +452,9 @@
 
       pildora.style.top = Math.max(metaY, reposoDoc - y) + 'px';
       pildora.style.transform = 'scale(' + (1 - (1 - ESC) * q) + ')';
+      // Ya dentro de la barra pierde la sombra de caida: no tiene de que
+      // separarse, y manchaba el papel de la seccion de abajo.
+      pildora.classList.toggle('acoplada', q >= 1);
       if (q >= 1) {
         // Ya acoplada se ancla por la derecha: un estado mas largo crece hacia
         // dentro de la barra y nunca se sale por el borde.
@@ -276,6 +481,7 @@
 
     function suelta() {
       fijo = false;
+      pildora.classList.remove('acoplada');
       pildora.style.position = '';
       pildora.style.left = pildora.style.right = pildora.style.top = '';
       pildora.style.transform = '';
@@ -286,14 +492,22 @@
 
     mide();
 
+    function paso(self) {
+      if (!cabe || (self && self.progress <= 0)) { if (fijo) suelta(); return; }
+      agarra();
+      coloca();
+    }
+
+    // onUpdate solo corre mientras el disparador esta dentro de su tramo. Un
+    // salto de ancla se lo brinca entero, y sin onLeave la pildora se quedaria
+    // clavada a media pagina, encima de lo que haya debajo.
     window.ScrollTrigger.create({
       trigger: losa, start: 'top bottom', end: 'top top', scrub: true,
-      onUpdate: function (self) {
-        if (self.progress <= 0 || !cabe) { if (fijo) suelta(); return; }
-        agarra();
-        coloca();
-      },
-      onLeaveBack: suelta
+      onUpdate: paso,
+      onLeave: paso,
+      onEnterBack: paso,
+      onLeaveBack: suelta,
+      onRefresh: paso
     });
 
     addEventListener('resize', function () {

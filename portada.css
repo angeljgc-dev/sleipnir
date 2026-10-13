@@ -1,5 +1,6 @@
+@charset "UTF-8";
 /* ---------------------------------------------------------------------------
-   Sleipnir. Portada.
+   Sleipnir.
    Dos materiales: tinta (la sala de maquinas) y papel (el negocio). La red vive
    dentro de una lamina acotada, no detras de todo, para que ningun texto de
    lectura se apoye en un fondo que se mueve.
@@ -84,6 +85,12 @@
 
 *{ box-sizing:border-box; }
 html{ -webkit-text-size-adjust:100%; }
+
+/* La barra esta fija arriba: un salto de ancla tiene que parar debajo de
+   ella, no detras. */
+#que-hace, #producto, #whatsapp, #planes, #quien, #contacto, #cierre{
+  scroll-margin-top:calc(var(--barra) + 18px);
+}
 
 body{
   margin:0;
@@ -276,6 +283,13 @@ html[data-js] .pildora{
     inset 1px 0 0 rgba(255,255,255,.08),
     inset -1px 0 0 rgba(255,255,255,.08),
     0 20px 44px -16px rgba(0,0,0,.9);
+}
+html[data-js] .pildora.acoplada{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    inset 0 -1px 0 rgba(255,255,255,.06),
+    inset 1px 0 0 rgba(255,255,255,.08),
+    inset -1px 0 0 rgba(255,255,255,.08);
 }
 html:not([data-js]) .pildora__punto{ display:none; }
 html:not([data-js]) .pildora__estados li{
@@ -480,12 +494,449 @@ html[data-js] .pildora__estados li.sale{ transform:translateY(-7px); }
   .losa__dentro{ max-width:1320px; margin:0 auto; }
 }
 
+/* ===========================================================================
+   EL RESTO DE LA PAGINA
+
+   Dos materiales que se alternan: tinta y papel. Cada seccion es un pliego
+   que sube sobre el anterior con las esquinas de arriba redondeadas, y la
+   coreografia solo aplana ese radio conforme llega. No hay un efecto nuevo
+   por seccion: la transicion ES el cambio de material.
+
+   La marca data-coreo la pone el JS cuando el motor de scroll ya esta
+   montado. Todo lo que esconde contenido cuelga de ella o de una clase que
+   el JS anade despues de comprobar que cabe: si el motor nunca llega, no se
+   pierde una sola linea.
+   =========================================================================== */
+
+.pliego{
+  position:relative; z-index:3;
+  padding:52px var(--g) 60px;
+  border-radius:var(--pliego-r, 22px) var(--pliego-r, 22px) 0 0;
+}
+.pliego__dentro{ max-width:1320px; margin:0 auto; }
+.pliego--papel{ background:var(--papel); color:var(--papel-tinta); }
+/* Un pliego de tinta encima de papel tiene que morder el papel, porque si no
+   sus esquinas redondeadas revelan tinta sobre tinta y el gesto no se ve. */
+.pliego--tinta{
+  background:var(--tinta); color:var(--hueso);
+  margin-top:-28px; padding-top:76px;
+}
+
+/* El titular grande. Es Instrument Sans y no la monoespaciada porque el
+   recorte del display no tiene acentos ni ene. */
+.titular{
+  margin:0 0 18px;
+  font-size:clamp(2rem, 8.4vw, 4.6rem);
+  line-height:1.03; font-weight:600; letter-spacing:-.028em;
+}
+.titular--medio{ font-size:clamp(1.65rem, 6vw, 3.1rem); line-height:1.08; max-width:30ch; }
+/* Este si rompe la columna: el cuerpo de la seccion vive en una medida de
+   lectura angosta y el titular se sale de ella a lo ancho del pliego. */
+.titular--roto{
+  font-size:clamp(2.2rem, 11.4vw, 7.6rem);
+  line-height:.94; letter-spacing:-.04em;
+  margin:0 0 34px;
+}
+
+/* ---------- 02 · el flujo: la red, quieta y rotulada ---------- */
+
+.flujo{
+  position:relative;
+  margin-top:48px; padding:22px 0 0 34px;
+  border-top:1px solid #D4CEC0;
+}
+.flujo__rotulo{
+  margin:0 0 18px;
+  font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--papel-tinta-2);
+}
+.flujo__via{ position:absolute; left:7px; top:62px; bottom:84px; width:1px; }
+.flujo__riel{
+  position:absolute; inset:0;
+  background:#C9C2B2;
+  transform-origin:top center;
+}
+.flujo__movil{
+  position:absolute; left:50%; top:0;
+  width:9px; height:9px; margin:-4px 0 0 -4px;
+  border-radius:50%; background:var(--ambar);
+  box-shadow:0 0 0 3px var(--papel);
+}
+.flujo__pasos{ margin:0; padding:0; list-style:none; display:grid; gap:1px; background:#D4CEC0; }
+.flujo__paso{ position:relative; background:var(--papel); padding:16px 0 18px 18px; }
+.flujo__paso--nucleo{ background:#EAE5DA; }
+.flujo__paso::before{
+  content:""; position:absolute; left:-32px; top:24px;
+  width:9px; height:9px; border-radius:50%;
+  background:var(--papel); border:1px solid #B3AC9A;
+}
+.flujo__indice{
+  margin:0 0 4px;
+  font-size:12px; font-weight:600; letter-spacing:.2em;
+  color:var(--papel-tinta-2);
+}
+.flujo__titulo{ margin:0 0 6px; font-size:19px; font-weight:600; letter-spacing:-.01em; }
+.flujo__texto{ margin:0; max-width:62ch; }
+.flujo__pie{ margin:20px 0 0; max-width:62ch; color:var(--papel-tinta); }
+
+/* ---------- 03 · el producto, fijado ---------- */
+
+.producto__dentro{ display:grid; grid-template-columns:minmax(0,1fr); gap:26px; }
+.producto__cabeza{ max-width:44ch; }
+.producto__pie{ margin:0; color:var(--hueso-2); max-width:46ch; }
+
+/* las cuatro marcas de avance: las pone el JS y son decorativas */
+.avance{ display:flex; gap:6px; margin-top:16px; }
+.avance span{
+  width:30px; height:3px; flex:0 0 auto;
+  background:var(--tinta-4);
+  transition:background var(--paso);
+}
+.avance span.viva{ background:var(--ambar); }
+
+.charlas{ margin:0; padding:0; list-style:none; display:grid; gap:24px; }
+.charla__verbo{
+  margin:0 0 10px; padding:3px 9px;
+  display:inline-block;
+  background:var(--tinta-2);
+  font-size:14px; font-weight:600; letter-spacing:.06em;
+  color:var(--hueso);
+}
+.charla__verbo b{ color:var(--hueso-2); font-weight:600; letter-spacing:.12em; margin-right:6px; }
+
+/* El panel es rectangular a proposito: es el unico sitio de la pagina donde
+   un vidrio puede llevar filtro sin pelearse con el border-radius. Lleva
+   desenfoque, saturacion y filo especular; la base queda casi opaca porque
+   adentro hay texto de lectura y su contraste no puede depender del fondo. */
+.panel{
+  position:relative;
+  padding:14px;
+  background:rgba(13,15,21,.92);
+  border:1px solid var(--tinta-3);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 -1px 0 rgba(255,255,255,.05),
+    0 26px 60px -26px rgba(0,0,0,.92);
+}
+.hilo{ margin:0; padding:0; list-style:none; display:grid; grid-template-columns:minmax(0,1fr); gap:7px; }
+.msg{
+  position:relative;
+  padding:8px 13px 9px;
+  line-height:1.4;
+  max-width:46ch;
+}
+.msg span{ display:inline; }
+.msg i{
+  font-style:normal; font-size:14px; color:var(--hueso-2);
+  white-space:nowrap;
+}
+.msg::before{
+  display:block;
+  font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--hueso-2);
+  margin-bottom:4px;
+}
+.msg--ellos{ background:var(--tinta-2); border:1px solid var(--tinta-3); }
+.msg--ellos::before{ content:"cliente"; }
+.msg--bot{ background:var(--tinta-3); border:1px solid var(--tinta-3); justify-self:end; }
+.msg--bot::before{ content:"Recepción IA"; }
+.msg--dueno{ background:var(--tinta-2); border:1px solid var(--tinta-3); border-left:2px solid var(--ambar); }
+.msg--dueno::before{ content:"el dueño"; }
+
+.charla__dato{
+  margin:12px 0 0; padding:9px 14px;
+  display:flex; align-items:center; gap:10px;
+  background:var(--tinta-2);
+  border:1px solid var(--tinta-3);
+  font-size:17px; color:var(--ambar);
+  border-radius:999px;
+  width:max-content; max-width:100%;
+}
+.charla__punto{ width:7px; height:7px; flex:0 0 auto; border-radius:50%; background:var(--ambar); }
+
+/* Fijado. La clase la pone el JS, y solo despues de comprobar que un estado
+   solo cabe entero en la pantalla. Si no cabe, la seccion se queda como
+   lista de cuatro y no se fija nada. */
+.producto.fijada{ padding-top:0; padding-bottom:0; }
+.producto.fijada .producto__alto{ height:300svh; }
+.producto.fijada .producto__fijo{
+  position:sticky; top:0; height:100svh;
+  display:flex; align-items:center;
+  padding:calc(var(--barra) + 16px) 0 22px;
+  overflow:hidden;
+}
+.producto.fijada .producto__dentro{ width:100%; }
+/* una sola celda de rejilla: los cuatro estados se apilan ahi y la celda
+   mide lo que el mas alto, asi que nada salta al cambiar */
+.producto.fijada .charlas{ display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:"pila"; gap:0; }
+.producto.fijada .charla{
+  grid-area:pila;
+  opacity:0; pointer-events:none;
+  transition:opacity .36s linear;
+}
+.producto.fijada .charla.activa{ opacity:1; pointer-events:auto; }
+/* el campo de lineas que el vidrio tiene detras: sin algo detras, un vidrio
+   no es un vidrio */
+.producto.fijada .producto__fijo::before{
+  content:""; position:absolute; inset:0; z-index:0;
+  background:repeating-linear-gradient(24deg, var(--rejilla) 0 1px, transparent 1px 34px);
+  pointer-events:none;
+}
+.producto.fijada .producto__dentro{ position:relative; z-index:1; }
+
+/* ---------- 04 · por qué por WhatsApp ---------- */
+
+.razon__texto{ margin:0 0 26px; max-width:56ch; }
+.razon__puntos{ margin:0; padding:0; list-style:none; display:grid; gap:1px; background:#D4CEC0; border:1px solid #D4CEC0; }
+.razon__puntos li{ background:var(--papel); padding:18px; }
+.razon__puntos h3{ margin:0 0 6px; font-size:19px; font-weight:600; letter-spacing:-.01em; }
+.razon__puntos p{ margin:0; max-width:46ch; }
+
+/* ---------- 05 · planes ---------- */
+
+.planes__texto{ margin:0 0 20px; max-width:62ch; }
+.planes__iva{
+  margin:0 0 30px; padding:10px 14px;
+  background:var(--tinta-2); border:1px solid var(--tinta-3);
+  width:max-content; max-width:100%;
+}
+.planes__iva b{ font-weight:600; }
+
+.planes__rejilla{ display:grid; gap:22px; }
+.plan{
+  position:relative;
+  padding:22px 0 4px;
+  border-top:1px solid var(--tinta-4);
+}
+/* El filete que separa las columnas es lo unico que se mueve aqui. Los
+   precios estan quietos y legibles desde el primer cuadro. */
+.plan__filete{
+  position:absolute; left:0; right:0; top:0; height:1px;
+  background:var(--ambar); transform-origin:left center;
+}
+.plan__indice{
+  margin:0 0 8px;
+  font-size:12px; font-weight:600; letter-spacing:.2em;
+  color:var(--hueso-2);
+}
+.plan__nombre{
+  margin:0 0 10px;
+  font-size:14px; font-weight:600; letter-spacing:.22em; text-transform:uppercase;
+}
+/* "+ IVA" va del mismo tamano que la cifra, no en letra chica. */
+.plan__precio{
+  margin:0;
+  font-size:clamp(2.1rem, 8vw, 2.9rem);
+  line-height:1.05; letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+}
+.plan__precio b{ font-weight:600; }
+.plan__precio span{ font-weight:400; color:var(--hueso); white-space:nowrap; }
+.plan__periodo{ margin:4px 0 16px; color:var(--hueso-2); }
+.plan__para{ margin:0 0 18px; max-width:40ch; }
+.plan__lista{ margin:0; padding:0; list-style:none; display:grid; gap:9px; }
+.plan__lista li{ position:relative; padding-left:18px; max-width:42ch; }
+.plan__lista li::before{
+  content:""; position:absolute; left:0; top:.62em;
+  width:7px; height:1px; background:var(--hueso-2);
+}
+.plan--medio .plan__nombre{ color:var(--ambar); }
+
+.planes__notas{
+  margin:40px 0 0; padding:22px 0 0; list-style:none;
+  border-top:1px solid var(--tinta-3);
+  display:grid; gap:12px;
+}
+.planes__notas li{ max-width:70ch; color:var(--hueso-2); }
+.planes__notas b{ color:var(--hueso); font-weight:600; }
+
+/* ---------- 06 · quién está detrás ---------- */
+
+.quien__texto{ margin:0 0 30px; max-width:62ch; }
+.datos{ margin:0; display:grid; gap:1px; background:#D4CEC0; border:1px solid #D4CEC0; }
+.dato{ background:var(--papel); padding:16px 18px; }
+.dato dt{
+  margin:0 0 6px;
+  font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--papel-tinta-2);
+}
+.dato dd{ margin:0; max-width:52ch; }
+/* El hueco que falta va compuesto: se ve que se dejo a proposito y se dice
+   por que. Lo que no esta decidido no se inventa. */
+.pendiente{
+  display:inline-block; padding:3px 11px;
+  border:1px dashed #B3AC9A;
+  font-weight:600; letter-spacing:.05em;
+}
+.dato dd em{ display:block; margin-top:7px; font-style:normal; color:var(--papel-tinta-2); }
+
+/* ---------- 08 · cierre ---------- */
+
+.cierre{ position:relative; background:transparent; margin-top:-28px; }
+/* El carril extra solo existe si el motor de scroll llego de verdad: si no,
+   la seccion mide una pantalla y no deja un hueco negro debajo. */
+html[data-coreo] .cierre{ height:180svh; }
+.cierre__fijo{
+  position:relative;
+  min-height:100svh;
+  display:grid; grid-template-columns:minmax(0,1fr); align-content:center;
+  padding:calc(var(--barra) + 44px) var(--g) 60px;
+  background:var(--tinta);
+  border-radius:var(--pliego-r, 22px) var(--pliego-r, 22px) 0 0;
+  overflow:hidden;
+}
+html[data-coreo] .cierre__fijo{ position:sticky; top:0; height:100svh; min-height:0; }
+.cierre__red{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block; opacity:0;
+  transition:opacity .9s linear;
+}
+html[data-js] .cierre__red.viva{ opacity:1; }
+html:not([data-js]) .cierre__red{ display:none; }
+/* El texto del cierre no se apoya en el canvas: va sobre chapa solida. */
+.cierre__panel{
+  position:relative; z-index:2;
+  width:100%; max-width:600px;
+  padding:24px 22px 26px;
+  background:var(--tinta-2);
+  border:1px solid var(--tinta-3);
+  box-shadow:0 44px 100px -34px #000;
+  display:grid; grid-template-columns:minmax(0,1fr); justify-items:start; gap:16px;
+}
+.cierre__titulo{
+  margin:0;
+  font-size:clamp(1.6rem, 6.6vw, 2.8rem);
+  line-height:1.08; font-weight:600; letter-spacing:-.025em;
+}
+.chapa{
+  margin:0; padding:9px 16px;
+  display:flex; align-items:center; gap:10px;
+  background:var(--tinta);
+  border:1px solid var(--tinta-4);
+  border-radius:999px;
+  font-size:17px;
+  width:max-content; max-width:100%;
+}
+.chapa__punto{ width:7px; height:7px; flex:0 0 auto; border-radius:50%; background:var(--ambar); }
+.cierre__accion{ min-width:min(260px, 100%); }
+
+/* ---------- la línea legal: una línea, no un pie con columnas ---------- */
+
+.legal{
+  position:relative; z-index:3;
+  margin:0; padding:14px var(--g) 20px;
+  background:var(--tinta);
+  border-top:1px solid var(--tinta-3);
+  display:flex; flex-wrap:wrap; align-items:center; gap:0 22px;
+  font-size:17px; color:var(--hueso-2);
+}
+.legal a{
+  min-height:44px; display:inline-flex; align-items:center;
+  color:var(--hueso); text-decoration:underline; text-underline-offset:3px;
+}
+
+/* ---------- las dos páginas legales ---------- */
+
+.hoja{
+  background:var(--papel); color:var(--papel-tinta);
+  min-height:100vh;
+  padding:calc(var(--barra) + 40px) var(--g) 80px;
+}
+.hoja__dentro{ max-width:68ch; margin:0 auto; }
+.hoja h1{
+  margin:0 0 10px;
+  font-size:clamp(1.8rem, 7.6vw, 3.1rem);
+  line-height:1.06; font-weight:600; letter-spacing:-.028em;
+}
+.hoja__fecha{ margin:0 0 34px; color:var(--papel-tinta-2); }
+.hoja h2{
+  margin:40px 0 12px;
+  font-size:21px; font-weight:600; letter-spacing:-.01em;
+  padding-top:16px; border-top:1px solid #D4CEC0;
+}
+.hoja h3{ margin:24px 0 8px; font-size:19px; font-weight:600; }
+.hoja p{ margin:0 0 14px; }
+.hoja ul{ margin:0 0 14px; padding-left:20px; }
+.hoja li{ margin-bottom:9px; }
+.hoja a{ color:var(--papel-tinta); text-decoration:underline; text-underline-offset:3px; }
+/* Lo que depende de la figura legal se marca aquí igual que en la ficha: a
+   la vista, nunca rellenado con algo que nadie decidió. */
+.hoja .pendiente{ font-size:17px; }
+.hoja__aviso{
+  margin:0 0 30px; padding:16px 18px;
+  background:#EAE5DA; border:1px solid #D4CEC0;
+}
+.hoja__aviso p:last-child{ margin:0; }
+.hoja__volver{
+  display:inline-flex; align-items:center; min-height:44px;
+  margin-top:40px; color:var(--papel-tinta);
+  text-decoration:underline; text-underline-offset:3px;
+}
+
+/* ---------- 540 y arriba ---------- */
+
+@media (min-width:540px){
+  .razon__puntos{ grid-template-columns:1fr 1fr; }
+  .datos{ grid-template-columns:1fr 1fr; }
+  .dato--ancho{ grid-column:1 / -1; }
+}
+
+/* ---------- 900 y arriba ---------- */
+
+@media (min-width:900px){
+  .pliego{ padding:92px var(--g) 104px; border-radius:var(--pliego-r, 30px) var(--pliego-r, 30px) 0 0; }
+  .pliego--tinta{ margin-top:-34px; padding-top:126px; }
+
+  .flujo{ margin-top:66px; padding-left:40px; }
+  .flujo__via{ left:9px; }
+  .flujo__paso{ padding:20px 0 22px 24px; display:grid; grid-template-columns:120px minmax(0,1fr); gap:0 24px; }
+  .flujo__indice{ margin:0; }
+  .flujo__titulo{ grid-column:2; }
+  .flujo__texto{ grid-column:2; }
+  .flujo__paso::before{ left:-38px; top:28px; }
+
+  .producto__dentro{ grid-template-columns:minmax(0,22rem) minmax(0,1fr); gap:0 56px; align-items:center; }
+  .producto__cabeza{ max-width:none; }
+  .charla__dato{ font-size:18px; }
+
+  .razon__cuerpo{ max-width:78ch; margin-left:auto; }
+  .razon__texto{ font-size:21px; max-width:50ch; }
+  .razon__puntos{ grid-template-columns:repeat(3,1fr); }
+
+  .planes__texto{ font-size:21px; }
+  .planes__rejilla{ grid-template-columns:repeat(3,1fr); gap:0 36px; }
+  .plan{ padding:26px 0 4px; }
+
+  .datos{ grid-template-columns:1fr 1fr; }
+  .dato{ padding:20px 22px; }
+
+  .cierre{ margin-top:-34px; }
+  .cierre__fijo{ border-radius:var(--pliego-r, 30px) var(--pliego-r, 30px) 0 0; }
+  .cierre__panel{ padding:34px 34px 36px; }
+
+  .legal{ padding:16px var(--g) 22px; }
+  .hoja{ padding:calc(var(--barra) + 72px) var(--g) 110px; }
+}
+
+@media (min-width:1500px){
+  .producto__dentro{ gap:0 90px; }
+}
+
 /* ---------- refraccion de verdad, solo donde existe ----------
    Medido: el filtro SVG dentro de backdrop-filter corre en Chromium, pero no
    recorta por border-radius. Por eso no se usa en la pildora; donde hay vidrio
    de verdad lo unico que sube es la transparencia de la base. */
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
   .pildora{ background:rgba(13,15,21,.86); }
+  /* El panel del producto es el unico rectangulo con vidrio de la pagina, y
+     lleva una sola capa de desenfoque. La base baja de .92 a .88 nada mas:
+     adentro hay texto de lectura y su contraste no puede depender de un
+     filtro que no se pudo probar en Safari ni en Firefox. */
+  .panel{
+    background:rgba(13,15,21,.88);
+    -webkit-backdrop-filter:blur(14px) saturate(160%);
+            backdrop-filter:blur(14px) saturate(160%);
+  }
 }
 
 /* ---------- movimiento reducido ---------- */
@@ -496,6 +947,7 @@ html[data-js] .pildora__estados li.sale{ transform:translateY(-7px); }
     transition:none !important;
     scroll-behavior:auto !important;
   }
-  .lamina__red{ display:none; }
+  .lamina__red,
+  .cierre__red{ display:none; }
   .baja{ display:none; }
 }

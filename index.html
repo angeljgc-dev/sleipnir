@@ -7,7 +7,7 @@
 <meta name="description" content="Sleipnir construye la mensajería que usan los negocios pequeños de México. Su primer producto es Recepción IA.">
 <meta name="color-scheme" content="dark">
 <!-- Fuera de buscadores mientras sea borrador: todavia faltan el nombre legal,
-     el domicilio y las paginas de privacidad y terminos. -->
+     el domicilio y el correo de contacto. -->
 <meta name="robots" content="noindex, nofollow">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2307080C'/><circle cx='16' cy='16' r='5.5' fill='%23ECEAE4'/><circle cx='16' cy='16' r='11' fill='none' stroke='%23FFB357' stroke-width='1.5'/></svg>">
@@ -20,7 +20,7 @@
 
 <script>
 // La marca enciende la capa de movimiento. Si el visitante pidió quietud, o si este
-// script nunca corre, la portada se queda en su forma completa y estática.
+// script nunca corre, la página se queda en su forma completa y estática.
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.dataset.js = '1';
 </script>
 </head>
@@ -90,8 +90,8 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
     <div class="bloque__pie">
       <p class="frase">Hacemos que un negocio pequeño de México conteste, agende y recuerde citas por WhatsApp. Sin cambiar de teléfono y sin contratar a nadie más.</p>
       <div class="acciones">
-        <a class="boton boton--fuerte" href="#que-hace">Ver Recepción IA</a>
-        <a class="boton" href="#contacto">Hablar por WhatsApp</a>
+        <a class="boton boton--fuerte" href="#producto">Ver Recepción IA</a>
+        <a class="boton" href="#contacto">Hablar con nosotros</a>
       </div>
     </div>
   </div>
@@ -99,7 +99,12 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
   <p class="baja" aria-hidden="true">baja</p>
 </section>
 
-<section class="losa" id="que-hace">
+<!-- =====================================================================
+     02 · Qué hace Sleipnir. Cambia el material: la losa de papel sube y
+     aplana su radio. Aquí la red deja de moverse y se vuelve diagrama: lo
+     que el canvas insinúa arriba, este flujo lo deja escrito.
+     ===================================================================== -->
+<section class="losa pliego pliego--papel" id="que-hace">
   <div class="losa__dentro">
     <p class="indice indice--papel">02 <span>/</span> qué hace Sleipnir</p>
     <h2 class="losa__titulo">Ponemos la mensajería.<br>El negocio pone el negocio.</h2>
@@ -110,10 +115,281 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
       <li>Contesta fuera de horario</li>
       <li>Arma promociones</li>
     </ul>
-    <span id="contacto"></span>
+
+    <!-- El mismo mapa de la portada, quieto y rotulado. La vía con el punto
+         ámbar es el único movimiento, y es el mensaje recorriéndola. -->
+    <div class="flujo" aria-describedby="flujo-cierre">
+      <p class="flujo__rotulo">Una conversación, de punta a punta</p>
+      <div class="flujo__via" aria-hidden="true">
+        <span class="flujo__riel"></span>
+        <span class="flujo__movil"></span>
+      </div>
+      <ol class="flujo__pasos">
+        <li class="flujo__paso">
+          <p class="flujo__indice">01</p>
+          <h3 class="flujo__titulo">Llega el mensaje</h3>
+          <p class="flujo__texto">Un cliente escribe al WhatsApp del negocio, el de siempre. No hay otra aplicación, ni otro número, ni un formulario que nadie llena.</p>
+        </li>
+        <li class="flujo__paso flujo__paso--nucleo">
+          <p class="flujo__indice">02</p>
+          <h3 class="flujo__titulo">Sleipnir lo entiende y lo guarda</h3>
+          <p class="flujo__texto">Lee lo que pidió, saca el servicio, el día y la hora, revisa la agenda, contesta y deja la conversación registrada. Esta es la capa que ponemos nosotros.</p>
+        </li>
+        <li class="flujo__paso">
+          <p class="flujo__indice">03</p>
+          <h3 class="flujo__titulo">Sale la cita y el recordatorio</h3>
+          <p class="flujo__texto">La cita queda en la agenda del negocio y el recordatorio sale a su hora por el mismo número. Si el dueño quiere, también se copia a su Google Calendar.</p>
+        </li>
+      </ol>
+      <p class="flujo__pie" id="flujo-cierre">Eso es la infraestructura: el negocio no instala nada, no cambia de número y no contrata a nadie. Sleipnir es la capa que va entre su WhatsApp y Meta, y es lo que Meta verifica.</p>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     03 · El producto. Vuelve la tinta. La sección se queda fijada mientras
+     se recorren los cuatro verbos: no se describen, se ven contestando.
+     Sin coreografía los cuatro bloques quedan uno debajo de otro, con sus
+     cuatro conversaciones completas, que es más información y no menos.
+     ===================================================================== -->
+<section class="pliego pliego--tinta producto" id="producto">
+  <div class="producto__alto">
+    <div class="producto__fijo">
+      <div class="pliego__dentro producto__dentro">
+        <div class="producto__cabeza">
+          <p class="indice">03 <span>/</span> el producto</p>
+          <h2 class="titular">Recepción IA</h2>
+          <p class="producto__pie">Cuatro cosas, y las hace sola. Lo que sigue son ejemplos de cómo contesta.</p>
+        </div>
+
+        <ol class="charlas" id="charlas">
+          <li class="charla">
+            <p class="charla__verbo"><b>01</b> Agenda citas</p>
+            <div class="panel">
+              <ul class="hilo">
+                <li class="msg msg--ellos"><span>¿tienes lugar mañana a las 4 con el güero?</span> <i>21:12</i></li>
+                <li class="msg msg--bot"><span>Sí, mañana 4:00 pm con Beto. ¿A nombre de quién te la aparto?</span> <i>21:12</i></li>
+                <li class="msg msg--ellos"><span>Luis</span> <i>21:13</i></li>
+                <li class="msg msg--bot"><span>Listo, Luis: corte con Beto, mañana 4:00 pm. Te aviso antes.</span> <i>21:13</i></li>
+              </ul>
+              <p class="charla__dato"><span class="charla__punto" aria-hidden="true"></span>cita agendada &middot; 16:00</p>
+            </div>
+          </li>
+
+          <li class="charla">
+            <p class="charla__verbo"><b>02</b> Manda recordatorios</p>
+            <div class="panel">
+              <ul class="hilo">
+                <li class="msg msg--bot"><span>Luis, te esperamos hoy a las 4:00 pm con Beto. ¿Confirmas?</span> <i>10:00</i></li>
+                <li class="msg msg--ellos"><span>va</span> <i>10:04</i></li>
+                <li class="msg msg--bot"><span>Confirmada. Si se te complica, dime y la movemos.</span> <i>10:04</i></li>
+              </ul>
+              <p class="charla__dato"><span class="charla__punto" aria-hidden="true"></span>recordatorio confirmado</p>
+            </div>
+          </li>
+
+          <li class="charla">
+            <p class="charla__verbo"><b>03</b> Contesta fuera de horario</p>
+            <div class="panel">
+              <ul class="hilo">
+                <li class="msg msg--ellos"><span>a qué hora abren mañana?</span> <i>23:41</i></li>
+                <li class="msg msg--bot"><span>Mañana abrimos a las 10:00 am. Si quieres te aparto lugar desde ahora.</span> <i>23:41</i></li>
+                <li class="msg msg--ellos"><span>sí, a las 11</span> <i>23:42</i></li>
+              </ul>
+              <p class="charla__dato"><span class="charla__punto" aria-hidden="true"></span>contestó a las 23:41</p>
+            </div>
+          </li>
+
+          <li class="charla">
+            <p class="charla__verbo"><b>04</b> Arma promociones</p>
+            <div class="panel">
+              <ul class="hilo">
+                <li class="msg msg--dueno"><span>2x1 en cortes el martes</span> <i>14:20</i></li>
+                <li class="msg msg--bot"><span>Hecho. Armé la imagen con tus precios y el texto. La mando a los clientes que aceptaron promociones. ¿La suelto?</span> <i>14:20</i></li>
+                <li class="msg msg--dueno"><span>sale</span> <i>14:21</i></li>
+              </ul>
+              <p class="charla__dato"><span class="charla__punto" aria-hidden="true"></span>promoción lista</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     04 · Por qué por WhatsApp. Vuelve el papel. No es una función que se
+     presume: es la objeción del dueño, contestada. El titular se sale de
+     la columna de lectura a propósito, porque es lo único que hay que oír.
+     ===================================================================== -->
+<section class="pliego pliego--papel razon" id="whatsapp">
+  <div class="pliego__dentro">
+    <p class="indice indice--papel">04 <span>/</span> por qué por WhatsApp</p>
+    <h2 class="titular titular--roto">Nadie va a cambiar de aplicación por nosotros.</h2>
+    <div class="razon__cuerpo">
+      <p class="razon__texto">Un dueño que trae las manos ocupadas no va a abrir un panel nuevo, ni va a enseñarle otra aplicación a su personal. Contesta donde ya contesta. Por eso Recepción IA vive en el WhatsApp del negocio y no en otro lado.</p>
+      <ul class="razon__puntos">
+        <li>
+          <h3>Su número y su app siguen igual</h3>
+          <p>Meta tiene una forma de conectar el número de WhatsApp Business del negocio a su API sin que el dueño pierda la aplicación. Se llama Coexistence, y es la que usamos.</p>
+        </li>
+        <li>
+          <h3>Lo que él contesta a mano sigue siendo gratis</h3>
+          <p>Cuando el dueño o su personal responden desde la app, no pasa por nosotros y no le cuesta un peso. Solo se cobra lo que manda el bot.</p>
+        </li>
+        <li>
+          <h3>El bot cubre el hueco, no el trabajo</h3>
+          <p>Las once de la noche, el domingo, el mensaje mientras corta el pelo, el recordatorio del día siguiente. Eso es lo que hoy se pierde.</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+     05 · Planes. Los precios están quietos y legibles desde el primer
+     cuadro: no se animan, no aparecen, no cuentan. Lo único que se mueve
+     son los filetes que separan las columnas.
+     ===================================================================== -->
+<section class="pliego pliego--tinta planes" id="planes">
+  <div class="pliego__dentro">
+    <p class="indice">05 <span>/</span> planes</p>
+    <h2 class="titular titular--medio">Meta le cobra sus mensajes directo al negocio, sin sobreprecio.</h2>
+    <p class="planes__texto">Sleipnir no revende los mensajes de WhatsApp. El negocio registra su método de pago con Meta y paga la tarifa que publica Meta, sin comisión nuestra encima. Contestarle a un cliente dentro de la ventana que ese cliente abrió al escribir primero no le cuesta nada; lo que Meta cobra son las plantillas que salen fuera de esa ventana, como el recordatorio del día anterior, y las de las promociones. Lo único que se le paga a Sleipnir es el plan.</p>
+    <p class="planes__iva">Los tres precios son mensuales y van <b>más IVA</b>. Son precios de lanzamiento.</p>
+
+    <div class="planes__rejilla">
+      <article class="plan">
+        <p class="plan__indice">01</p>
+        <h3 class="plan__nombre">Arranque</h3>
+        <p class="plan__precio"><b>$399</b> <span>+ IVA</span></p>
+        <p class="plan__periodo">al mes</p>
+        <p class="plan__para">Para quien no quiere trámites ni pagarle nada a Meta. Es un puente, no un destino.</p>
+        <ul class="plan__lista">
+          <li>Número dedicado del bot, vinculado. Sin pagos a Meta</li>
+          <li>300 conversaciones al mes</li>
+          <li>Recordatorios ilimitados</li>
+          <li>WhatsApp y Telegram</li>
+          <li>2 campañas de promoción al mes</li>
+          <li>1 usuario del panel, 2 profesionales en agenda</li>
+          <li>No está disponible para consultorios</li>
+        </ul>
+      </article>
+
+      <article class="plan plan--medio">
+        <p class="plan__indice">02</p>
+        <h3 class="plan__nombre">Recepcionista</h3>
+        <p class="plan__precio"><b>$699</b> <span>+ IVA</span></p>
+        <p class="plan__periodo">al mes</p>
+        <p class="plan__para">El que recomendamos. WhatsApp oficial con el mismo número y la misma app del negocio.</p>
+        <ul class="plan__lista">
+          <li>WhatsApp oficial con Coexistence: su número y su app siguen igual</li>
+          <li>800 conversaciones al mes</li>
+          <li>Recordatorios ilimitados</li>
+          <li>WhatsApp y Telegram</li>
+          <li>6 campañas de promoción al mes</li>
+          <li>3 usuarios del panel, 6 profesionales en agenda</li>
+          <li>Respuesta de soporte en menos de 4 horas hábiles</li>
+        </ul>
+      </article>
+
+      <article class="plan">
+        <p class="plan__indice">03</p>
+        <h3 class="plan__nombre">Pro</h3>
+        <p class="plan__precio"><b>$1,299</b> <span>+ IVA</span></p>
+        <p class="plan__periodo">al mes</p>
+        <p class="plan__para">Consultorios y volumen alto. Es el único plan que puede tocar datos de salud.</p>
+        <ul class="plan__lista">
+          <li>WhatsApp oficial con Coexistence, obligatorio</li>
+          <li>2,000 conversaciones al mes</li>
+          <li>Recordatorios ilimitados</li>
+          <li>WhatsApp y Telegram</li>
+          <li>15 campañas de promoción al mes</li>
+          <li>10 usuarios del panel, 15 profesionales en agenda</li>
+          <li>Datos de salud con consentimiento expreso y retención de 30 días</li>
+        </ul>
+      </article>
+    </div>
+
+    <ul class="planes__notas">
+      <li><b>Pago anual:</b> se pagan diez mensualidades en lugar de doce.</li>
+      <li><b>Instalación:</b> darse de alta por cuenta propia no cuesta nada. Si prefiere que lo dejemos funcionando, son $990 una sola vez, o $1,490 en consultorios. Va incluida con el pago anual.</li>
+      <li><b>Pasar de Arranque a Recepcionista:</b> sin costo, cuando el negocio quiera.</li>
+      <li><b>Si el negocio se pasa de su plan:</b> el bot no se apaga a media semana. El primer exceso no se cobra; si se repite dos meses seguidos, le proponemos subir de plan.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =====================================================================
+     06 · Quién está detrás. Ficha de datos, con los campos que todavía no
+     existen marcados como lo que son. Lo que no está decidido no se
+     inventa, y el hueco va compuesto para que se vea deliberado.
+     ===================================================================== -->
+<section class="pliego pliego--papel quien" id="quien">
+  <div class="pliego__dentro">
+    <p class="indice indice--papel">06 <span>/</span> quién está detrás</p>
+    <h2 class="titular titular--medio">Una empresa que está empezando, y lo dice.</h2>
+    <p class="quien__texto">Sleipnir es una empresa mexicana de software. Va a operar la API de WhatsApp Business como proveedor de tecnología de Meta; el trámite de verificación es el paso que sigue. Esta ficha se completa el día que se decida la figura legal, y hasta entonces los campos que faltan se quedan así, a la vista.</p>
+
+    <dl class="datos" id="contacto">
+      <div class="dato">
+        <dt>Razón social</dt>
+        <dd><span class="pendiente">Por definir</span>
+          <em>Está entre persona física con actividad empresarial y SAS. Se publica aquí en cuanto se constituya.</em></dd>
+      </div>
+      <div class="dato">
+        <dt>Domicilio fiscal</dt>
+        <dd><span class="pendiente">Por definir</span>
+          <em>Depende de la figura legal anterior.</em></dd>
+      </div>
+      <div class="dato">
+        <dt>Correo de contacto</dt>
+        <dd><span class="pendiente">Por definir</span>
+          <em>Depende del dominio, que todavía no está registrado.</em></dd>
+      </div>
+      <div class="dato">
+        <dt>WhatsApp</dt>
+        <dd><span class="pendiente">Por definir</span>
+          <em>Sleipnir todavía no tiene número de WhatsApp Business. No publicamos uno que no existe.</em></dd>
+      </div>
+      <div class="dato">
+        <dt>Dónde opera</dt>
+        <dd>México</dd>
+      </div>
+      <div class="dato">
+        <dt>Qué vende hoy</dt>
+        <dd>Un producto: Recepción IA, en tres planes.</dd>
+      </div>
+      <div class="dato dato--ancho">
+        <dt>Clientes</dt>
+        <dd>Ninguno todavía. No hay logotipos en esta página, ni testimonios, ni un contador de citas agendadas, porque no habría de dónde sacarlos.</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<!-- =====================================================================
+     08 · Cierre. La red vuelve a pantalla completa por única vez y los
+     nodos se juntan. El texto va sobre chapa sólida, no sobre el canvas.
+     ===================================================================== -->
+<section class="cierre" id="cierre">
+  <div class="cierre__fijo">
+    <canvas class="cierre__red" id="red2" aria-hidden="true"></canvas>
+    <div class="cierre__panel">
+      <p class="indice">08 <span>/</span> cierre</p>
+      <p class="cierre__titulo">Que el negocio conteste.<br>De eso vive Sleipnir.</p>
+      <p class="chapa"><span class="chapa__punto" aria-hidden="true"></span>Recepción IA &middot; en WhatsApp</p>
+      <a class="boton boton--fuerte cierre__accion" href="#planes">Ver los planes</a>
+    </div>
   </div>
 </section>
 </main>
+
+<p class="legal">
+  Sleipnir &middot; México
+  <a href="privacidad.html">Aviso de privacidad</a>
+  <a href="terminos.html">Términos del servicio</a>
+</p>
 
 <script src="red.js" defer></script>
 <script src="portada.js" defer></script>
