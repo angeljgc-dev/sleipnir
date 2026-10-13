@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleipnir</title>
+<meta name="description" content="Sleipnir construye la mensajería que usan los negocios pequeños de México. Su primer producto es Recepción IA.">
+<meta name="color-scheme" content="dark">
+<!-- Fuera de buscadores mientras sea borrador: todavia faltan el nombre legal,
+     el domicilio y las paginas de privacidad y terminos. -->
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%2307080C'/><circle cx='16' cy='16' r='5.5' fill='%23ECEAE4'/><circle cx='16' cy='16' r='11' fill='none' stroke='%23FFB357' stroke-width='1.5'/></svg>">
+
+<!-- Las dos tipografias se sirven desde aqui, recortadas a lo que la pagina escribe:
+     una conexion menos que resolver y nada que pedirle a un tercero. -->
+<link rel="preload" href="fuentes/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fuentes/martian-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="portada.css">
+
+<script>
+// La marca enciende la capa de movimiento. Si el visitante pidió quietud, o si este
+// script nunca corre, la portada se queda en su forma completa y estática.
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.dataset.js = '1';
+</script>
+</head>
+<body>
+
+<header class="barra">
+  <a class="barra__marca" href="#">Sleipnir</a>
+  <p class="barra__giro">Infraestructura de mensajería para negocios pequeños. México.</p>
+  <div class="barra__muelle" id="muelle" aria-hidden="true"></div>
+</header>
+
+<main>
+<section class="portada">
+
+  <!-- La lámina: aquí vive la red, y aquí vive el único texto que se apoya en ella. -->
+  <div class="lamina">
+    <canvas class="lamina__red" id="red" aria-hidden="true"></canvas>
+
+    <p class="lamina__rotulo">
+      <b>Mapa</b> Cada punto es un negocio. Cada línea, una conversación que pasa por Sleipnir.
+    </p>
+
+    <ul class="anclas">
+      <li class="ancla">
+        <span class="ancla__punto" aria-hidden="true"></span>
+        <span class="ancla__texto"><b>01</b> un negocio</span>
+      </li>
+      <li class="ancla">
+        <span class="ancla__punto" aria-hidden="true"></span>
+        <span class="ancla__texto"><b>02</b> una conversación</span>
+      </li>
+      <li class="ancla">
+        <span class="ancla__punto" aria-hidden="true"></span>
+        <span class="ancla__texto"><b>03</b> una cita</span>
+      </li>
+    </ul>
+
+    <div class="ficha">
+      <p class="ficha__titulo">Recepción IA</p>
+      <!-- El hueco reserva el alto de la píldora: cuando se acopla a la barra
+           pasa a posición fija y nada de alrededor se mueve. -->
+      <div class="ficha__hueco" id="hueco">
+        <div class="pildora" id="pildora">
+          <span class="pildora__punto" aria-hidden="true"></span>
+          <ul class="pildora__estados" id="estados">
+            <li>cita agendada &middot; 14:30</li>
+            <li>recordatorio enviado</li>
+            <li>contestó fuera de horario</li>
+            <li>3 citas hoy</li>
+          </ul>
+        </div>
+      </div>
+      <p class="ficha__pie">Ejemplos de lo que hace el producto.</p>
+    </div>
+  </div>
+
+  <!-- El bloque de título, sobre tinta sólida. Nada de esto se apoya en el canvas. -->
+  <div class="bloque">
+    <p class="indice">01 <span>/</span> la empresa</p>
+
+    <h1 class="nombre" id="nombre">
+      <span class="nombre__lectura">Sleipnir</span>
+      <span class="nombre__celdas" aria-hidden="true"
+        ><span class="celda">S</span><span class="celda">L</span><span class="celda">E</span><span class="celda">I</span><span class="celda">P</span><span class="celda">N</span><span class="celda">I</span><span class="celda">R</span></span>
+    </h1>
+
+    <div class="bloque__pie">
+      <p class="frase">Hacemos que un negocio pequeño de México conteste, agende y recuerde citas por WhatsApp. Sin cambiar de teléfono y sin contratar a nadie más.</p>
+      <div class="acciones">
+        <a class="boton boton--fuerte" href="#que-hace">Ver Recepción IA</a>
+        <a class="boton" href="#contacto">Hablar por WhatsApp</a>
+      </div>
+    </div>
+  </div>
+
+  <p class="baja" aria-hidden="true">baja</p>
+</section>
+
+<section class="losa" id="que-hace">
+  <div class="losa__dentro">
+    <p class="indice indice--papel">02 <span>/</span> qué hace Sleipnir</p>
+    <h2 class="losa__titulo">Ponemos la mensajería.<br>El negocio pone el negocio.</h2>
+    <p class="losa__texto">Sleipnir es proveedor de tecnología: conecta la API de WhatsApp Business de Meta con negocios pequeños de México y se encarga de que cada conversación llegue, se guarde y se conteste. Recepción IA es el primer producto que corre sobre esa base.</p>
+    <ul class="verbos">
+      <li>Agenda citas</li>
+      <li>Manda recordatorios</li>
+      <li>Contesta fuera de horario</li>
+      <li>Arma promociones</li>
+    </ul>
+    <span id="contacto"></span>
+  </div>
+</section>
+</main>
+
+<script src="red.js" defer></script>
+<script src="portada.js" defer></script>
+</body>
+</html>

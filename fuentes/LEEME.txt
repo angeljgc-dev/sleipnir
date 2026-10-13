@@ -1,0 +1,11 @@
+Las dos tipografias del sitio, recortadas a los caracteres que la pagina usa.
+
+instrument-sans.woff2   Instrument Sans, archivo variable de 400 a 600. Texto corrido.
+                        Recorte: ASCII imprimible, acentos y signos del espanol, y los
+                        signos tipograficos que aparecen. Conserva el kerning.
+martian-mono.woff2      Martian Mono 700. Solo el nombre y el revoltijo, asi que lleva
+                        A-Z y 0-9 y nada mas: no tiene acentos, ni enie, ni espacio.
+                        No sirve para escribir nada que no sea eso.
+
+Las dos estan bajo la SIL Open Font License 1.1. El texto completo de cada licencia,
+con su aviso de copyright, esta en OFL-instrument-sans.txt y OFL-martian-mono.txt.

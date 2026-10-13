@@ -1,0 +1,501 @@
+/* ---------------------------------------------------------------------------
+   Sleipnir. Portada.
+   Dos materiales: tinta (la sala de maquinas) y papel (el negocio). La red vive
+   dentro de una lamina acotada, no detras de todo, para que ningun texto de
+   lectura se apoye en un fondo que se mueve.
+   --------------------------------------------------------------------------- */
+
+:root{
+  --tinta:        #07080C;
+  --tinta-2:      #0D0F15;   /* paneles solidos */
+  --tinta-3:      #191D25;   /* filete */
+  --tinta-4:      #2B313D;   /* filete fuerte */
+  --hueso:        #ECEAE4;   /* texto principal sobre tinta */
+  --hueso-2:      #B7BCC7;   /* texto secundario sobre tinta */
+  --papel:        #F4F1EA;
+  --papel-tinta:  #14161C;
+  --papel-tinta-2:#414754;
+  --ambar:        #FFB357;   /* una sola cosa calida: la actividad */
+
+  --rejilla: rgba(236,234,228,.05);
+  --g: 18px;                 /* margen lateral */
+  --barra: 56px;
+  --nombre: clamp(2.1rem, 14.6vw, 8.5rem);
+  --paso: .34s cubic-bezier(.2,.7,.2,1);
+}
+
+/* ---------- las dos tipografias, servidas desde aqui ----------
+   Instrument Sans va como archivo variable: un solo archivo para los tres
+   pesos que usa la pagina. Martian Mono solo escribe el nombre y el revoltijo,
+   asi que lleva A-Z y 0-9 y nada mas. */
+@font-face{
+  font-family:"Instrument Sans";
+  src: url("fuentes/instrument-sans.woff2") format("woff2");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family:"Martian Mono";
+  src: url("fuentes/martian-mono.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Respaldos con las metricas corregidas. Un respaldo que no ocupa lo mismo
+   reacomoda el texto cuando llega la tipografia buena, y eso se ve como un
+   brinco. Los numeros salen de comparar el ancho medio de los caracteres que
+   esta pagina escribe, no de redondear a ojo: Segoe UI va 2.8% mas estrecha
+   que Instrument Sans, y Consolas 27.3% mas que Martian Mono. Los altos se
+   sobrescriben para que la caja de linea mida exactamente lo mismo. */
+@font-face{
+  font-family:"Sans respaldo";
+  src: local("Segoe UI"), local("Roboto");
+  size-adjust: 102.8%;
+  ascent-override: 94.4%;
+  descent-override: 24.3%;
+  line-gap-override: 0%;
+}
+@font-face{
+  font-family:"Sans respaldo 2";
+  src: local("Helvetica Neue"), local("Arial"), local("Liberation Sans"), local("DejaVu Sans");
+  size-adjust: 101.2%;
+  ascent-override: 95.8%;
+  descent-override: 24.7%;
+  line-gap-override: 0%;
+}
+@font-face{
+  font-family:"Mono respaldo";
+  src: local("Consolas"), local("Cascadia Mono");
+  size-adjust: 127.3%;
+  ascent-override: 78.6%;
+  descent-override: 15.7%;
+  line-gap-override: 0%;
+}
+@font-face{
+  font-family:"Mono respaldo 2";
+  src: local("Menlo"), local("DejaVu Sans Mono"), local("Liberation Mono"), local("Courier New");
+  size-adjust: 116.5%;
+  ascent-override: 85.8%;
+  descent-override: 17.2%;
+  line-gap-override: 0%;
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+
+body{
+  margin:0;
+  background:var(--tinta);
+  color:var(--hueso);
+  font-family:"Instrument Sans", "Sans respaldo", "Sans respaldo 2", system-ui, sans-serif;
+  font-size:18px;
+  line-height:1.55;
+  overflow-x:hidden;
+}
+
+::selection{ background:var(--ambar); color:#231300; }
+
+a{ color:inherit; }
+
+:where(a,button):focus-visible{
+  outline:2px solid var(--ambar);
+  outline-offset:3px;
+  border-radius:3px;
+}
+
+/* ---------- barra ---------- */
+
+.barra{
+  position:fixed; inset:0 0 auto 0; z-index:40;
+  height:var(--barra);
+  display:flex; align-items:center; gap:16px;
+  padding:0 var(--g);
+  background:var(--tinta);
+  border-bottom:1px solid var(--tinta-3);
+}
+.barra__marca{
+  flex:0 0 auto;
+  font-size:14px; font-weight:600; letter-spacing:.22em;
+  text-transform:uppercase; text-decoration:none;
+  white-space:nowrap;
+}
+.barra__giro{
+  margin:0; flex:1 1 auto; min-width:0;
+  font-size:14px; color:var(--hueso-2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  display:none;
+}
+/* Sitio reservado en la barra para cuando la pildora se acople ahi. Encoge
+   antes que la marca, que es lo unico de la barra que no se puede recortar. */
+.barra__muelle{ width:0; height:1px; flex:0 1 auto; }
+
+/* ---------- portada ---------- */
+
+.portada{
+  position:relative;
+  min-height:100vh; min-height:100svh;
+  /* el pie de abajo es el aire que necesita el rotulo "baja": sin el, en una
+     pantalla de portatil corta la ultima linea queda partida por el borde */
+  padding:calc(var(--barra) + 18px) var(--g) 20px;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  /* el plano de medicion: esto es lo que queda cuando no hay canvas */
+  background-image:
+    linear-gradient(to right, var(--rejilla) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rejilla) 1px, transparent 1px);
+  background-size:72px 72px, 72px 72px;
+  background-position:var(--g) var(--barra);
+}
+/* regla vertical con marcas, a la izquierda: lenguaje de plano tecnico */
+.portada::before{
+  content:""; position:absolute; z-index:1;
+  left:calc(var(--g) * .5); top:var(--barra); bottom:0; width:5px;
+  background:
+    linear-gradient(to bottom, var(--tinta-3) 0 100%) left/1px 100% no-repeat,
+    repeating-linear-gradient(to bottom, var(--tinta-4) 0 1px, transparent 1px 24px) left/5px 100% no-repeat;
+  opacity:.9;
+}
+
+/* ---------- lamina (la red acotada) ---------- */
+
+.lamina{
+  position:relative;
+  /* la altura sigue a la pantalla, pero con un minimo bajo: la portada entera
+     tiene que caber en un portatil de 720 px de alto sin empujar nada fuera */
+  height:clamp(228px, 30svh, 400px);
+  margin-bottom:60px;
+}
+.lamina__red{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block;
+  opacity:0;
+  transition:opacity .7s linear;
+  /* la red se disuelve antes de llegar al bloque de titulo */
+  -webkit-mask-image:linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
+          mask-image:linear-gradient(to bottom, #000 0, #000 62%, transparent 100%);
+}
+html[data-js] .lamina__red.viva{ opacity:1; }
+
+.lamina__rotulo{
+  position:absolute; z-index:3; left:0; top:0;
+  /* ancho generoso en telefono: cuantas menos lineas ocupe el rotulo, mas
+     sitio queda debajo para que las tres anclas no se amontonen */
+  max-width:94%;
+  margin:0; padding:8px 11px;
+  background:var(--tinta-2);
+  border:1px solid var(--tinta-3);
+  font-size:13px; line-height:1.42; color:var(--hueso-2);
+}
+.lamina__rotulo b{
+  display:block; color:var(--hueso);
+  font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  margin-bottom:3px;
+}
+
+/* ---------- anclas numeradas ---------- */
+
+.anclas{ margin:0; padding:0; list-style:none; }
+.ancla{
+  position:absolute; z-index:2;
+  left:var(--x); top:var(--y);
+  display:flex; align-items:center; gap:9px;
+  transform:translate(-5px,-50%);
+}
+/* En telefono las tres anclas se reparten la lamina sin pisar el rotulo de
+   arriba ni la ficha de abajo. El ancla 02 es la de etiqueta mas larga, asi
+   que queda a la derecha del titulo de la ficha y por encima de el. */
+.ancla:nth-child(1){ --x:8%;  --y:50%; }
+.ancla:nth-child(2){ --x:38%; --y:66%; }
+.ancla:nth-child(3){ --x:57%; --y:42%; }
+
+.ancla__punto{
+  width:10px; height:10px; flex:0 0 auto; border-radius:50%;
+  background:var(--hueso);
+  box-shadow:0 0 0 4px var(--tinta), 0 0 0 5px var(--tinta-4);
+}
+.ancla.late .ancla__punto{
+  background:var(--ambar);
+  box-shadow:0 0 0 4px var(--tinta), 0 0 0 5px var(--ambar);
+}
+
+.ancla__texto{
+  padding:3px 8px;
+  background:var(--tinta-2);
+  border:1px solid var(--tinta-3);
+  font-size:14px; line-height:1.3; color:var(--hueso);
+  white-space:nowrap;
+}
+.ancla__texto b{
+  font-weight:600; color:var(--hueso-2);
+  letter-spacing:.1em; margin-right:5px;
+}
+
+/* ---------- ficha y pildora viva ---------- */
+
+.ficha{
+  position:absolute; z-index:5;
+  left:0; right:0; bottom:-58px;
+  display:flex; flex-direction:column; gap:7px;
+  align-items:flex-start;
+  padding-top:11px;
+  border-top:1px solid var(--tinta-3);
+}
+.ficha__titulo{
+  margin:0; padding:3px 8px;
+  background:var(--tinta-2);
+  font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--hueso-2);
+}
+/* Los dos rotulos de la ficha caen sobre la cola de la red: van en chapa solida
+   para que su contraste no dependa de donde quede un nodo. */
+.ficha__pie{ margin:0; padding:3px 8px; background:var(--tinta-2); font-size:14px; color:var(--hueso-2); }
+
+.ficha__hueco{ align-self:stretch; }
+html[data-js] .ficha__hueco{ position:relative; height:46px; }
+html[data-js] .pildora{ position:absolute; left:0; top:0; }
+
+.pildora{ position:relative; display:flex; align-items:center; gap:10px; }
+
+/* El vidrio. Con motor lo lleva la pildora entera; sin motor lo lleva cada
+   estado por separado, porque una sola pildora con cuatro renglones deja de
+   ser una pildora. Es una sola capa de desenfoque a la vez. */
+html[data-js] .pildora{
+  min-height:46px; padding:0 20px 0 16px;
+  border-radius:999px;
+  /* Base casi opaca: el texto de la pildora es lo unico que se apoya en la red,
+     y asi su contraste no depende de lo que pase por detras. */
+  background:rgba(13,15,21,.9);
+  -webkit-backdrop-filter:blur(16px) saturate(165%);
+          backdrop-filter:blur(16px) saturate(165%);
+  /* filo especular: no hay refraccion SVG porque no respeta el border-radius */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.2),
+    inset 0 -1px 0 rgba(255,255,255,.06),
+    inset 1px 0 0 rgba(255,255,255,.08),
+    inset -1px 0 0 rgba(255,255,255,.08),
+    0 20px 44px -16px rgba(0,0,0,.9);
+}
+html:not([data-js]) .pildora__punto{ display:none; }
+html:not([data-js]) .pildora__estados li{
+  display:flex; align-items:center; gap:10px;
+  min-height:42px; padding:0 16px;
+  border-radius:999px;
+  background:var(--tinta-2);
+  border:1px solid var(--tinta-3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+}
+html:not([data-js]) .pildora__estados li::before{
+  content:""; width:7px; height:7px; flex:0 0 auto;
+  border-radius:50%; background:var(--ambar);
+}
+
+.pildora__punto{
+  width:7px; height:7px; flex:0 0 auto; border-radius:50%;
+  background:var(--ambar);
+}
+.pildora__estados{
+  margin:0; padding:0; list-style:none;
+  display:flex; flex-wrap:wrap; gap:8px;
+  font-size:16px; line-height:1.35;
+}
+.pildora__estados li{ white-space:nowrap; }
+
+/* ---------- sin motor: el mapa se lee como leyenda, no como fantasma ----------
+   Si no hay canvas, tres puntos sueltos en un hueco negro no dicen nada. En ese
+   caso la lamina se cierra y lo mismo se lee en vertical: rotulo, leyenda
+   numerada y la ficha con los cuatro estados.
+
+   Esta lamina cerrada va apretada a proposito. Lo que primero tiene que verse
+   en un telefono es el nombre, la frase y las dos acciones; si la leyenda y los
+   cuatro estados se quedan con la pantalla entera, lo importante cae debajo del
+   pliegue y la jerarquia sale al reves. Nada se quita ni se reordena: los cuatro
+   estados siguen en el HTML y en el mismo orden, solo ocupan menos. */
+html:not([data-js]) .lamina{ height:auto; margin-bottom:26px; }
+html:not([data-js]) .lamina__rotulo{ position:static; max-width:52ch; }
+/* el nombre del rotulo entra en la misma linea que su frase */
+html:not([data-js]) .lamina__rotulo b{ display:inline; margin:0 7px 0 0; }
+html:not([data-js]) .anclas{
+  display:flex; flex-wrap:wrap; align-items:center;
+  gap:8px 12px; margin-top:12px;
+}
+html:not([data-js]) .ancla{ position:static; transform:none; }
+html:not([data-js]) .ficha{ position:static; margin-top:16px; }
+/* los cuatro estados en reticula: dos y dos, en vez de cuatro renglones */
+html:not([data-js]) .pildora__estados{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+html:not([data-js]) .pildora__estados li{
+  min-height:40px; padding:7px 12px;
+  white-space:normal; line-height:1.25;
+}
+html:not([data-js]) .bloque__pie{ margin-top:14px; padding-top:12px; gap:16px; }
+html[data-js] .pildora__estados{
+  position:relative; display:block; height:1.35em; min-width:1px;
+  transition:width .44s cubic-bezier(.2,.8,.2,1);
+}
+html[data-js] .pildora__estados li{
+  position:absolute; left:0; top:0;
+  opacity:0; transform:translateY(7px);
+  pointer-events:none;
+  transition:opacity .26s linear, transform .3s cubic-bezier(.2,.8,.2,1);
+}
+html[data-js] .pildora__estados li.activo{
+  opacity:1; transform:none; pointer-events:auto;
+}
+html[data-js] .pildora__estados li.sale{ transform:translateY(-7px); }
+
+/* ---------- bloque de titulo ---------- */
+
+.bloque{ position:relative; z-index:2; grid-row:2; align-self:end; }
+
+.indice{
+  margin:0 0 10px;
+  font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--hueso-2);
+}
+.indice span{ color:var(--hueso-2); margin:0 2px; font-weight:400; }
+
+.nombre{ margin:0; }
+.nombre__lectura{
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip-path:inset(50%); white-space:nowrap;
+}
+.nombre__celdas{
+  display:flex;
+  font-family:"Martian Mono", "Mono respaldo", "Mono respaldo 2", ui-monospace, monospace;
+  font-weight:700;
+  font-size:var(--nombre);
+  /* alto fijo: aunque el display llegue tarde, nada de abajo se mueve */
+  height:var(--nombre);
+  line-height:1;
+  align-items:center;
+  color:var(--hueso);
+}
+.celda{
+  display:inline-block;
+  width:1ch; flex:0 0 auto;
+  text-align:center;
+  font-variant-ligatures:none;
+}
+
+.bloque__pie{
+  margin-top:18px; padding-top:16px;
+  border-top:1px solid var(--tinta-3);
+  display:grid; gap:20px;
+}
+.frase{ margin:0; max-width:46ch; font-size:18px; color:var(--hueso); }
+
+.acciones{ display:flex; flex-direction:column; gap:10px; align-items:stretch; }
+.boton{
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; padding:0 22px;
+  border:1px solid var(--tinta-4);
+  background:var(--tinta-2);
+  color:var(--hueso);
+  font-size:17px; font-weight:500; text-decoration:none;
+  transition:background var(--paso), border-color var(--paso), transform var(--paso);
+}
+.boton:hover{ border-color:var(--hueso-2); transform:translateY(-1px); }
+.boton--fuerte{
+  background:var(--hueso); color:var(--tinta); border-color:var(--hueso);
+  font-weight:600;
+}
+.boton--fuerte:hover{ background:#fff; border-color:#fff; }
+
+.baja{
+  grid-row:3;
+  margin:12px 0 0;
+  font-size:12px; font-weight:600; letter-spacing:.24em; text-transform:uppercase;
+  color:var(--hueso-2);
+}
+
+/* ---------- losa de papel ---------- */
+
+.losa{
+  position:relative; z-index:3;
+  background:var(--papel);
+  color:var(--papel-tinta);
+  border-radius:var(--losa-r, 22px) var(--losa-r, 22px) 0 0;
+  padding:48px var(--g) 56px;
+}
+.losa__dentro{ max-width:72ch; margin:0 auto; }
+.indice--papel{ color:var(--papel-tinta-2); }
+.indice--papel span{ color:var(--papel-tinta-2); }
+
+.losa__titulo{
+  margin:0 0 20px;
+  font-size:clamp(1.55rem, 6.4vw, 3rem);
+  line-height:1.08; font-weight:600; letter-spacing:-.02em;
+}
+.losa__texto{ margin:0 0 28px; max-width:56ch; color:var(--papel-tinta); }
+
+.verbos{
+  margin:0; padding:0; list-style:none;
+  display:grid; gap:1px;
+  background:#D4CEC0;
+  border:1px solid #D4CEC0;
+}
+.verbos li{
+  background:var(--papel);
+  padding:14px 16px;
+  font-size:17px; font-weight:500;
+}
+
+/* ---------- 540 y arriba ---------- */
+
+@media (min-width:540px){
+  :root{ --g:28px; }
+  .lamina__rotulo{ max-width:min(29ch, 60%); }
+  .ficha{ left:auto; right:0; max-width:min(380px, 64%); }
+  .acciones{ flex-direction:row; align-items:center; }
+  .boton{ flex:0 0 auto; }
+  .verbos{ grid-template-columns:1fr 1fr; }
+}
+
+/* ---------- 900 y arriba ---------- */
+
+@media (min-width:900px){
+  :root{ --g:40px; --barra:64px; --nombre:clamp(5rem, 10.2vw, 8.5rem); }
+  body{ font-size:19px; }
+  .barra__giro{ display:block; }
+  .lamina{ height:clamp(236px, 32svh, 420px); margin-bottom:58px; }
+  /* mismo reparto que en telefono, con la lamina mas ancha: el 01 queda
+     bastante por debajo del rotulo y el 02 a la izquierda de la ficha */
+  .ancla:nth-child(1){ --x:9%; --y:52%; }
+  .ancla:nth-child(2){ --x:27%; --y:80%; }
+  .ancla:nth-child(3){ --x:49%; --y:22%; }
+  .ficha{ max-width:400px; bottom:-56px; }
+  .bloque__pie{
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end; gap:40px;
+  }
+  .frase{ font-size:20px; }
+  .losa{ padding:88px var(--g) 104px; border-radius:var(--losa-r, 30px) var(--losa-r, 30px) 0 0; }
+  .losa__dentro{ max-width:none; }
+  .losa__texto{ font-size:20px; }
+  .verbos{ grid-template-columns:repeat(4,1fr); }
+}
+
+@media (min-width:1500px){
+  .losa__dentro{ max-width:1320px; margin:0 auto; }
+}
+
+/* ---------- refraccion de verdad, solo donde existe ----------
+   Medido: el filtro SVG dentro de backdrop-filter corre en Chromium, pero no
+   recorta por border-radius. Por eso no se usa en la pildora; donde hay vidrio
+   de verdad lo unico que sube es la transparencia de la base. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)){
+  .pildora{ background:rgba(13,15,21,.86); }
+}
+
+/* ---------- movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation:none !important;
+    transition:none !important;
+    scroll-behavior:auto !important;
+  }
+  .lamina__red{ display:none; }
+  .baja{ display:none; }
+}
