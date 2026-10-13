@@ -195,6 +195,7 @@ html[data-js] .lamina__red.viva{ opacity:1; }
   border:1px solid var(--tinta-3);
   font-size:13px; line-height:1.42; color:var(--hueso-2);
 }
+.lamina__rotulo{ box-shadow:0 0 0 1px var(--tinta-3); }
 .lamina__rotulo b{
   display:block; color:var(--hueso);
   font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
@@ -234,6 +235,7 @@ html[data-js] .lamina__red.viva{ opacity:1; }
   font-size:14px; line-height:1.3; color:var(--hueso);
   white-space:nowrap;
 }
+.ancla__texto{ box-shadow:0 0 0 1px var(--tinta-3); }
 .ancla__texto b{
   font-weight:600; color:var(--hueso-2);
   letter-spacing:.1em; margin-right:5px;
@@ -252,12 +254,17 @@ html[data-js] .lamina__red.viva{ opacity:1; }
 .ficha__titulo{
   margin:0; padding:3px 8px;
   background:var(--tinta-2);
+  box-shadow:0 0 0 1px var(--tinta-2);
   font-size:12px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
   color:var(--hueso-2);
 }
 /* Los dos rotulos de la ficha caen sobre la cola de la red: van en chapa solida
    para que su contraste no dependa de donde quede un nodo. */
-.ficha__pie{ margin:0; padding:3px 8px; background:var(--tinta-2); font-size:14px; color:var(--hueso-2); }
+.ficha__pie{
+  margin:0; padding:3px 8px;
+  background:var(--tinta-2); box-shadow:0 0 0 1px var(--tinta-2);
+  font-size:14px; color:var(--hueso-2);
+}
 
 .ficha__hueco{ align-self:stretch; }
 html[data-js] .ficha__hueco{ position:relative; height:46px; }
