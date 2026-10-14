@@ -366,12 +366,11 @@
     window.ScrollTrigger.refresh();
 
     // En un telefono la barra de direcciones se esconde y reaparece al subir y
-    // bajar, y eso cambia innerHeight sin cambiar nada del reparto: los altos
-    // de la pagina van en svh. Pero los tramos del scroll si se miden contra
-    // innerHeight, y si no se vuelven a medir se quedan torcidos: el cierre se
-    // quedaba a medio formar aunque se llegara hasta abajo del todo. Se espera
-    // a que pare de moverse, porque durante el gesto llegan muchos avisos
-    // seguidos y volver a medir en cada uno no es gratis.
+    // bajar, y eso cambia innerHeight sin cambiar nada de los altos, que van en
+    // svh. Los tramos del scroll si se miden contra innerHeight, asi que hay
+    // que volver a medirlos o quedan torcidos. Se espera a que pare de moverse,
+    // porque durante el gesto llegan muchos avisos seguidos y volver a medir en
+    // cada uno no es gratis.
     var remide;
     addEventListener('resize', function () {
       clearTimeout(remide);
@@ -537,15 +536,10 @@
           scrollTrigger: { trigger: sec, start: 'top bottom', end: 'top top', scrub: 0.4 }
         });
     }
-    if (!red2) return;
-    // El recorrido fijado manda los tres actos. Van los cinco avisos y no solo
-    // onUpdate: un salto de ancla se brinca el tramo entero y dejaria el pais a
-    // medio formar.
-    function pon(self) { red2.progreso(self.progress); }
-    window.ScrollTrigger.create({
-      trigger: sec, start: 'top top', end: 'bottom bottom', scrub: true,
-      onUpdate: pon, onLeave: pon, onEnterBack: pon, onLeaveBack: pon, onRefresh: pon
-    });
+    // El mapa no cuelga del scroll: se forma por reloj en cuanto la seccion
+    // entra en pantalla, y de eso se encarga mexico.js con su propio
+    // observador. Aqui solo queda el aplanado del radio, que es el gesto que
+    // comparten todos los pliegos.
   }
 
   // La pildora sube con la pagina hasta que topa con la barra, y ahi se queda

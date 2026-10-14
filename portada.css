@@ -271,6 +271,39 @@ html[data-js] .anclas--vivas .ancla--izq:nth-child(n+2).puesta{
   font-weight:600; color:var(--hueso-2);
   letter-spacing:.1em; margin-right:5px;
 }
+/* Por debajo de 600 el rotulo se queda en la palabra: "negocio",
+   "conversacion", "cita". El numero y el articulo se van de la vista.
+
+   Esta medido. Los destinos del recorrido son nodos en sitios donde la
+   etiqueta cabe entera sin tocar la leyenda, la ficha ni el filo, y donde
+   ademas se vea llegar la linea. En una lamina de telefono "02 una
+   conversacion" mide 177 px y casi ninguna pareja de sitios pasa las dos
+   pruebas: el ciclo acababa yendo siempre a los mismos dos o tres destinos,
+   que es la monotonia que habia que quitar. Con el rotulo en 122 px, en veinte
+   vueltas seguidas salen 11 parejas distintas de mediana a 390 en vez de 6, y
+   10 en vez de 4 a 320 (seis cargas por ancho; el reparto de destinos se
+   sortea en cada carga, asi que una sola no dice nada).
+
+   Lo que el numero decia lo dice mejor el recorrido: las etiquetas no estan
+   puestas, aparecen una tras otra conforme el mensaje las toca. En escritorio
+   sobra sitio y el rotulo se queda entero.
+
+   Se sacan de flujo en vez de ponerles display:none para que el lector de
+   pantalla los siga leyendo: "01 un negocio" existe siempre en el documento. */
+@media (max-width:599px){
+  .ancla__texto b, .ancla__art{
+    position:absolute; width:1px; height:1px; overflow:hidden;
+    clip-path:inset(50%); white-space:nowrap; margin:0;
+  }
+}
+/* Sin JavaScript y con movimiento reducido los tres rotulos se leen en fila y
+   quietos, no colgando de un punto: ahi no hay recorrido que cuente el orden,
+   asi que el numero y el articulo tienen que verse. */
+html:not([data-js]) .ancla__texto b,
+html:not([data-js]) .ancla__art{
+  position:static; width:auto; height:auto; clip-path:none;
+}
+html:not([data-js]) .ancla__texto b{ margin-right:5px; }
 
 /* ---------- ficha y pildora viva ---------- */
 
@@ -829,14 +862,13 @@ html[data-js] .pildora.fija .pildora__estados li{ left:auto; right:0; }
 /* ---------- 08 · cierre ---------- */
 
 .cierre{ position:relative; background:transparent; margin-top:-28px; }
-/* El carril largo se gana dos veces: hace falta que el motor de scroll llegara
-   y que la red del mapa arrancara de verdad. Si falta cualquiera de las dos, la
-   seccion mide una pantalla y no deja un carril vacio por el que no pasa nada.
-   Y cuando si pasa, son tres actos (disperso, agrupandose, formado y hablando)
-   y necesitan recorrido: con menos, el pais se arma de golpe y nadie lo ve
-   agruparse, que es lo unico que habia que ver. */
-html[data-coreo] .cierre{ height:100svh; }
-html[data-coreo] .cierre.cierre--vivo{ height:260svh; }
+/* El cierre mide una pantalla y nada mas. Antes llevaba un carril fijado de
+   260svh porque los tres actos del mapa se armaban conforme se bajaba, y ese
+   carril hacia justo lo contrario de lo que debia: quien llegaba veia puntos
+   sueltos y el panel ya con su titulo y su boton, daba la pagina por terminada
+   y no bajaba el resto. Ahora la formacion corre por reloj y arranca sola al
+   entrar en pantalla, asi que no hace falta recorrido y la seccion se comporta
+   como cualquier otro pliego. */
 .cierre__fijo{
   position:relative;
   min-height:100svh;
@@ -847,7 +879,6 @@ html[data-coreo] .cierre.cierre--vivo{ height:260svh; }
   border-radius:var(--pliego-r, 22px) var(--pliego-r, 22px) 0 0;
   overflow:hidden;
 }
-html[data-coreo] .cierre__fijo{ position:sticky; top:0; height:100svh; min-height:0; }
 .cierre__red{
   position:absolute; inset:0; width:100%; height:100%;
   display:block; opacity:0;

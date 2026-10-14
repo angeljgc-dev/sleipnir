@@ -43,18 +43,25 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
       <b>Mapa</b> Cada punto es un negocio. Cada línea, una conversación que pasa por Sleipnir.
     </p>
 
+    <!-- En teléfono el rótulo se queda en la palabra: "negocio",
+         "conversación", "cita". No es capricho: los destinos del recorrido se
+         eligen entre sitios donde la etiqueta cabe entera sin tapar nada, y en
+         una lámina estrecha cada píxel de rótulo que sobra se come la mitad de
+         los sitios posibles. El número y el artículo se ocultan a la vista pero
+         siguen en el HTML, así que el lector de pantalla lee los tres pasos
+         completos y en orden. En escritorio salen enteros. -->
     <ul class="anclas">
       <li class="ancla">
         <span class="ancla__punto" aria-hidden="true"></span>
-        <span class="ancla__texto"><b>01</b> un negocio</span>
+        <span class="ancla__texto"><b>01</b><span class="ancla__art"> un </span>negocio</span>
       </li>
       <li class="ancla">
         <span class="ancla__punto" aria-hidden="true"></span>
-        <span class="ancla__texto"><b>02</b> una conversación</span>
+        <span class="ancla__texto"><b>02</b><span class="ancla__art"> una </span>conversación</span>
       </li>
       <li class="ancla">
         <span class="ancla__punto" aria-hidden="true"></span>
-        <span class="ancla__texto"><b>03</b> una cita</span>
+        <span class="ancla__texto"><b>03</b><span class="ancla__art"> una </span>cita</span>
       </li>
     </ul>
 

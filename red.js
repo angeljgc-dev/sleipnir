@@ -350,11 +350,20 @@
       // telefono el sitio libre da para poco, y una vuelta repetida es mejor
       // que ninguna, pero una que no se vea no vale de nada.
       var topes = [8, 8, 14, 1e9];
+      // Los tres puntos del recorrido tienen que quedar bien separados; si no,
+      // las tres etiquetas salen apinadas en un rincon y el camino deja de
+      // leerse como camino. Con el rotulo de telefono ya corto caben pares mas
+      // apretados que antes, y a los peores hay que decirles que no: ni el 02
+      // pegado al 03, ni ninguno de los dos pegado al 01. La ultima pasada se
+      // queda sin este filtro, porque ahi lo unico que importa es que salga
+      // alguna vuelta.
+      var APARTE = Math.max(66, Math.min(an, al) * 0.26);
       var mejor = null;
       for (var pas = 0; pas < 4; pas++) {
+        var aparte = pas > 2 ? 24 * 24 : APARTE * APARTE;
         for (var k = 0; k < pares.length; k++) {
           var a = paradas[pares[k][0]], b = paradas[pares[k][1]];
-          if (d2(a.p, b.p) < 24 * 24 || d2(o, b.p) < 24 * 24) continue;
+          if (d2(a.p, b.p) < aparte || d2(o, b.p) < aparte || d2(o, a.p) < aparte) continue;
           if (pas < 3 && zona(a.p) * 10 + zona(b.p) === parAnterior) continue;
           if (pas < 1 && !alterna(o, a.p, b.p)) continue;
 

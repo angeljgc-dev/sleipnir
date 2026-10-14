@@ -1,11 +1,25 @@
 /* El cierre: los nodos dispersos se juntan hasta formar Mexico y ahi empiezan
    a hablar entre ellos.
 
-   Tres actos atados al scroll, en este orden:
+   Tres actos, en este orden:
      1. pocos puntos, grandes y muy separados, casi sin lineas;
      2. aparecen los demas, encogen y viajan a su sitio dentro del pais;
      3. ya formado, los puntos de dentro se mandan mensajes: el enlace se
         enciende en ambar, cruza un punto y se apaga.
+
+   Los tres corren por reloj, no por scroll, y el reloj arranca cuando la
+   seccion entra en pantalla. Atados al scroll pedian un tramo fijado de
+   260svh, y ese tramo hacia dano por partida triple: quien llegaba veia puntos
+   sueltos junto a un panel con su titulo y su boton, daba la pagina por
+   terminada y no bajaba el resto, asi que el remate no lo veia casi nadie; la
+   pagina media pantalla y media de mas; y los tramos del scroll se miden
+   contra innerHeight mientras los altos van en svh, de modo que la barra de
+   direcciones de un Android desajustaba la cuenta y el pais se quedaba a medio
+   formar. Por reloj no pasa ninguna de las tres.
+
+   El reloj solo avanza mientras el lienzo esta en pantalla y la pestana
+   visible, y no se reinicia nunca: quien sube y vuelve a bajar lo encuentra
+   donde lo dejo.
 
    El contorno no se dibuja de memoria ni a mano: llega como la "d" del SVG que
    ya esta escrito en el HTML, sacada de Natural Earth. Asi el dato existe una
@@ -84,12 +98,16 @@
     var dpr = 1, an = 0, al = 0;
     var nodos = [], enlaces = [], tandas = [], mensajes = [];
     var rafId = 0, dentro = true, T = 0, ultimoAlta = 0, tics = 0;
+    var avance = 0, corriendo = false, anterior = 0;
     var esc = 1, ox = 0, oy = 0;
     var sembrados = 0, radioU = 30, piezas = [0, 0];
     var base = null, baseOk = false, baseX = 0, baseY = 0, baseAn = 0, baseAl = 0;
     var SEMILLA = 20261013;
     var TOPE_VECINOS = 6;
     var REZAGO = 0.28;      // cuanto se escalona la llegada entre el primer nodo y el ultimo
+    var ESPERA = 700;       // lo que se ve el desorden antes de que empiece a juntarse
+    var FORMA = 5700;       // lo que tarda el pais en quedar hecho
+    var SALTO = 60;         // tope por cuadro, para que un paron no adelante el reloj
 
     /* ---------------- donde cabe el pais ---------------- */
 
@@ -330,13 +348,32 @@
       coloca();
     }
 
-    /* ---------------- el scroll manda los tres actos ---------------- */
+    /* ---------------- el reloj manda los tres actos ---------------- */
 
-    // 0 es disperso del todo, 1 es el pais hecho. Los primeros centimetros de
-    // la seccion no forman nada a proposito: hay que ver el desorden antes.
-    function progreso(p) {
-      T = (p - 0.10) / 0.52;
+    // 0 es disperso del todo, 1 es el pais hecho. Los primeros 0.7 s no forman
+    // nada a proposito: hay que ver el desorden antes.
+    //
+    // El reloj se suma cuadro a cuadro y no se saca restando dos marcas de
+    // tiempo: entre una y otra el lienzo puede haber estado fuera de pantalla o
+    // la pestana en segundo plano, y ahi no se pinta, asi que con la resta el
+    // que se va y vuelve se encontraria el pais adelantado de golpe. El tope
+    // por cuadro hace lo mismo con un paron del hilo principal.
+    function reloj(ahora) {
+      if (!corriendo || T >= 1) { anterior = ahora; return; }
+      var paso = ahora - anterior;
+      anterior = ahora;
+      if (paso > 0) avance += paso > SALTO ? SALTO : paso;
+      T = (avance - ESPERA) / FORMA;
       T = T < 0 ? 0 : T > 1 ? 1 : T;
+    }
+
+    // Se llama cuando la seccion entra en pantalla, y solo la primera vez: el
+    // que sube y vuelve a bajar no tiene que verlo empezar de nuevo.
+    function empieza() {
+      if (corriendo) return;
+      corriendo = true;
+      anterior = performance.now();
+      arranca();
     }
 
     function suave(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
@@ -400,6 +437,7 @@
       tics++;
       if (!an || !al || esc <= 0) return;
       ahora = ahora || performance.now();
+      reloj(ahora);
       ctx.clearRect(0, 0, an, al);
 
       // Con T en 1 ya llegaron todos, por definicion: el mas rezagado sale a
@@ -531,9 +569,18 @@
     }
 
     function arranca() {
-      if (!rafId && !quieto && dentro && !document.hidden) rafId = requestAnimationFrame(cuadro);
+      if (rafId || quieto || !dentro || document.hidden) return;
+      // El rato que estuvo parado no cuenta: el reloj sigue donde lo dejo.
+      anterior = performance.now();
+      rafId = requestAnimationFrame(cuadro);
     }
     function para() { if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } }
+
+    // Con movimiento reducido no hay formacion que ver: el pais sale hecho en el
+    // unico cuadro que se pinta y no se pide ni uno mas. En la practica aqui no
+    // se llega, porque sin la marca data-js el CSS esconde este lienzo y deja
+    // el mapa quieto del HTML; va igual, para que el archivo se valga solo.
+    if (quieto) { avance = ESPERA + FORMA; T = 1; }
 
     medir();
     cuadro(performance.now());
@@ -548,10 +595,19 @@
         dentro = ent[0].isIntersecting;
         if (dentro) arranca(); else para();
       }, { rootMargin: '80px' }).observe(canvas);
-    } else { arranca(); }
+      // Y un segundo observador para el reloj. Pide mas que el otro, un tercio
+      // de la seccion a la vista, porque la formacion tiene que empezar cuando
+      // el visitante ya esta mirando el cierre y no cuando le asoma el filo de
+      // arriba: si no, el primer acto se le pasa antes de llegar.
+      new IntersectionObserver(function (ent) {
+        if (ent[0].isIntersecting) empieza();
+      }, { threshold: 0.34 }).observe(canvas);
+    } else { arranca(); empieza(); }
 
     return {
-      progreso: progreso, medir: medir, para: para, arranca: arranca,
+      empieza: empieza, medir: medir, para: para, arranca: arranca,
+      formado: function () { return T >= 1; },
+      reloj: function () { return avance; },
       nodos: function () { return nodos; },
       cuadros: function () { return tics; },
       enlaces: function () { return enlaces.length; },
