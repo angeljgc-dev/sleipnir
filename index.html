@@ -415,14 +415,20 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentEl
       <a class="boton boton--fuerte cierre__accion" href="#planes">Ver los planes</a>
     </div>
   </div>
+
+  <!-- La línea legal vive dentro del cierre, no debajo. El motivo es de
+       encuadre: el cierre es lo último de la página y ahí es donde el visitante
+       se queda. Si la línea colgara fuera, empujaría el cierre hacia arriba justo
+       en la posición final del scroll y la punta norte de Baja California
+       quedaría debajo de la barra. Dentro, el cierre y su línea legal ocupan una
+       pantalla entre los dos y el país se ve completo. -->
+  <p class="legal">
+    Sleipnir &middot; México
+    <a href="privacidad.html">Aviso de privacidad</a>
+    <a href="terminos.html">Términos del servicio</a>
+  </p>
 </section>
 </main>
-
-<p class="legal">
-  Sleipnir &middot; México
-  <a href="privacidad.html">Aviso de privacidad</a>
-  <a href="terminos.html">Términos del servicio</a>
-</p>
 
 <!-- mexico.js no va aquí: solo hace falta al final de la página y se baja con la
      coreografía, ya entregada la portada. -->
